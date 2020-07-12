@@ -13,7 +13,7 @@ class spotifyapi:
         self.client_id = client_id
         self.client_secret = client_secret
         self.authenticated = False
-        self.header = {'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '}
+        self.header = {'Accept' : 'application/json', 'Content-Type' : 'application/json'}
         self.playlists = []
 
     def setHeader(self, token):

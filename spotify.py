@@ -14,6 +14,10 @@ spotifyapi = spotifyapi(config.get('Spotify', 'client_id'), config.get('Spotify'
 prev_url='/'
 
 def coverImage(playlist_id):
+    # make sure covers folder exists
+    if not os.path.exists('./covers'):
+        os.makedirs('./cover')
+    # check if playlist_id has a stored cover image
     if not os.path.isfile('covers/'+str(playlist_id)+'.jpg'):
         cover_url = spotifyapi.getCoverImage(playlist_id)
         urllib.request.urlretrieve(cover_url, 'covers/'+str(playlist_id)+'.jpg')
@@ -39,12 +43,14 @@ def auth2():
     global prev_url
     code = request.args.get('code')
     spotifyapi.token(code)
+    # redirect to prev_url 
+    # which is used to go back to page where authentication was started
     return redirect(prev_url, code=302)
 
 @app.route('/search')
 def search():
     global prev_url
-    ## add search bar
+    # add search bar
     html = '<form action="/search" method="get">'
     html += '<div class="input-group">'
     html += '<input type="text" class="form-control" placeholder="Songname" name=\'q\'/>'
@@ -70,8 +76,6 @@ def search():
         html += '<div>'
         return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
-        # authenticate first if not logged in currently
-        # /auth will redirect to prev_url
         return redirect(url_for('auth'))
 
 @app.route('/tracks')
@@ -102,7 +106,6 @@ def playlists():
             html += '<div class="grid-item">'
             html += '<p>'+playlist[1]+'</p>'
             html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'"><img width="300" height="300" src="'+cover_path+'"/></a>'
-            #html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'"><img width="300" height="300" src="'+spotifyapi.getCoverImage(playlist[0])+'"/></a>'
             html += '</div>'
         html += '</div>'
         return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
