@@ -2,7 +2,7 @@
 I was tired of saying "please make sure to not click on a song" when i was giving away my phone so someone else could add his favorite songs to the playback queue and then still fucking up the playback, so i decided to write a web interface (e.g. for the use on a tablet) for spotify that only allows adding songs to the queue.
 
 # Features
-- Add songs to queue
+- Add songs to queue (only works if spotify is actively playing)
 - List saved songs
 - List playlists (own + followed ones)
      - And all songs of a specific playlist
