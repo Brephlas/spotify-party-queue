@@ -5,7 +5,7 @@ I was tired of saying "please make sure to not click on a song" when i was givin
 - Add songs to queue
 - List saved songs
 - List playlists (own + followed ones)
-      - list songs of specific playlist
+     - And all songs of a specific playlist
 - Transfer playback to another device
 
 # Planned features
