@@ -14,8 +14,10 @@ I was tired of saying "please make sure to not click on a song" when i was givin
 - Get all saved songs (currently limited to 50)
 
 # Prerequisites
-- Python3 `sudo apt install python3 python3-pip`
-- flask and configparser `pip3 install flask ConfigParser`
+- Python3 
+     - `sudo apt install python3 python3-pip`
+- flask and configparser 
+     - `pip3 install flask ConfigParser`
 
 # Install
 1. Create a spotify application in the spotify [developer dashboard](https://developer.spotify.com/dashboard/applications)
