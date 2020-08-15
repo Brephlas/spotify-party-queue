@@ -16,6 +16,10 @@
         <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{{ url_for('static',filename='styles/styles.css') }}" rel="stylesheet" />
+
+        <!-- Simple keyboard -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
+        <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.min.js"></script>
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -33,6 +37,7 @@
                         <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/tracks">Tracks</a></li>
                         <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/playlists">Playlists</a></li>
                         <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/devices">Devices</a></li>
+                        <li class="nav-item mx-0 mx-lg-1"><a class="keyb nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="toggleKeyboard()"><img src="{{ url_for('static',filename='assets/img/keyboard.png') }}"/></a></li>
                     </ul>
                 </div>
             </div>

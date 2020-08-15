@@ -10,7 +10,7 @@ app = Flask(__name__)
 config = configparser.ConfigParser()
 configFilePath = './config.ini'
 config.read(configFilePath)
-spotifyapi = spotifyapi(config.get('Spotify', 'client_id'), config.get('Spotify', 'client_secret'))
+spotifyapi = spotifyapi(config.get('Spotify', 'client_id'), config.get('Spotify', 'client_secret'), config.get('Network', 'port'))
 prev_url='/'
 
 def coverImage(playlist_id):
@@ -30,7 +30,8 @@ def covers(filename):
 @app.route('/')
 def template():
     if spotifyapi.isAuthenticated():
-        return render_template('index.html', current=spotifyapi.getCurrentlyPlaying())
+        return redirect('/search', code=302)
+        #return render_template('index.html', current=spotifyapi.getCurrentlyPlaying())
     else:
         return redirect(url_for('auth'))
 
@@ -53,11 +54,13 @@ def search():
     # add search bar
     html = '<form action="/search" method="get">'
     html += '<div class="input-group">'
-    html += '<input type="text" class="form-control" placeholder="Songname" name=\'q\'/>'
+    html += '<input id="1" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name=\'q\'/>'
     html += '<input type="hidden" name="type" value="track"/>'
     html += '<button type="submit" class="btn btn-sp">Success</button>'
     html += '</div>'
     html += '</form>'
+    html += '<hr id="hr" style="display: none;">'
+    html += '<div id="keyboard" style="display: none;" class="simple-keyboard"></div>'
     html += '<hr>'
     # add search content
     html += '<div class="col-lg-11 mx-auto">'
@@ -151,4 +154,4 @@ def devices():
             return redirect(url_for('auth'))
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=config.get('Network', 'port'))

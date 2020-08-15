@@ -10346,3 +10346,26 @@ form .row:first-child .floating-label-form-group {
 }
 
 body { padding-top: 70px; }
+
+
+input {
+  width: 100%;
+  height: 100px;
+  padding: 20px;
+  font-size: 20px;
+  border: none;
+  box-sizing: border-box;
+}
+
+.simple-keyboard {
+  max-width: 850px;
+}
+
+.hg-button {
+  color: #1DB954;
+  background: black !important;
+}
+
+.hg-theme-default {
+  background-color: black !important;
+}

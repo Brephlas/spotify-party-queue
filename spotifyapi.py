@@ -7,9 +7,9 @@ import spotipy.util as util
 from flask import redirect
 from noauthException import noauthException
 
-
 class spotifyapi:
-    def __init__(self, client_id, client_secret):
+    def __init__(self, client_id, client_secret, _port):
+        self.port = _port
         self.client_id = client_id
         self.client_secret = client_secret
         self.authenticated = False
@@ -58,10 +58,10 @@ class spotifyapi:
     def authorize(self):
         permissions = ['user-modify-playback-state', 'playlist-read-private', 'user-read-playback-state', 'user-library-read']
         scope = '%20'.join(permissions)
-        return redirect('https://accounts.spotify.com/authorize?client_id='+self.client_id+'&response_type=code&redirect_uri=http://192.168.178.119:5000/token&scope='+scope, code=302)
+        return redirect('https://accounts.spotify.com/authorize?client_id='+self.client_id+'&response_type=code&redirect_uri=http://192.168.178.119:'+self.port+'/token&scope='+scope, code=302)
 
     def token(self, code):
-        body_params = {'grant_type' : 'authorization_code', 'code' : code, 'redirect_uri' : 'http://192.168.178.119:5000/token'}
+        body_params = {'grant_type' : 'authorization_code', 'code' : code, 'redirect_uri' : 'http://192.168.178.119:'+self.port+'/token'}
         url='https://accounts.spotify.com/api/token'
 
         response=requests.post(url, data=body_params, auth = (self.client_id, self.client_secret))
@@ -80,7 +80,7 @@ class spotifyapi:
             self.setToken(data['access_token'], self.refresh_token, data['expires_in'])
 
     def search(self, q, t):
-        if not q or not t:
+        if not q or not t or q == 'None' or t == 'None':
             return ''
         try:
             data = self.sendRequest('https://api.spotify.com/v1/search?q='+str(q)+'&type='+str(t)+'&limit=10')
@@ -91,7 +91,7 @@ class spotifyapi:
                 uri = track['uri']
                 tracks.append((artist, song, uri))
             return tracks
-        except noauthException:
+        except (noauthException, KeyError):
             raise noauthException
 
     def getSavedTracks(self):
@@ -139,11 +139,12 @@ class spotifyapi:
 
     def getCurrentlyPlaying(self):
         data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
-        if not data:
+        try:
+            artist = data['item']['artists'][0]['name']
+            song = data['item']['name']
+            return artist + ' - ' + song
+        except:
             return 'Nothing playing right now'
-        artist = data['item']['artists'][0]['name']
-        song = data['item']['name']
-        return artist + ' - ' + song
 
     def getDevices(self):
         try:
