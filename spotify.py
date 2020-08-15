@@ -60,7 +60,7 @@ def search():
     html += '</div>'
     html += '</form>'
     html += '<hr id="hr" style="display: none;">'
-    html += '<div id="keyboard" style="display: none;" class="simple-keyboard"></div>'
+    html += '<div id="keyboard" style="display: none; margin-left:auto; margin-right:auto;" class="simple-keyboard"></div>'
     html += '<hr>'
     # add search content
     html += '<div class="col-lg-11 mx-auto">'
@@ -85,12 +85,16 @@ def search():
 def tracks():
     global prev_url
     prev_url = '/tracks'
-    html = '<div class="col-lg-11 mx-auto">'
+    html = '<div class="col-lg-12 mx-auto">'
     try:
         tracks = spotifyapi.getSavedTracks()
+        html += '<h3 class="green">Here are your '+str(len(tracks))+' saved tracks</h3>'
+        html += '<hr>'
         for track in tracks:
-            html += track[0]+' - '+track[1]
+            html += '<div>'
+            html += '<p style="overflow-wrap: break-word; display:inline;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button class="btn btn-primary right" onclick="addSong(\''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
+            html += '</div>'
             html += '<hr>'
         html += '<div>'
         return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())

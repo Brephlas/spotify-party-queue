@@ -7,7 +7,7 @@ I was tired of saying "please make sure to not click on a song" when i was givin
 - List playlists (own + followed ones)
      - And all songs of a specific playlist
 - Transfer playback to another device
-- Keyboard for search bar: [simple-keyboard](https://hodgef.com/simple-keyboard/)
+- Keyboard for search bar (used [simple-keyboard](https://hodgef.com/simple-keyboard/))
 
 # Planned features
 - Configurable list of playlists that should be listed
