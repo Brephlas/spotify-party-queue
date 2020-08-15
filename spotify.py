@@ -1,4 +1,5 @@
 from flask import Flask, escape, request, redirect, render_template, url_for, send_from_directory, jsonify
+from flask_socketio import SocketIO, send, emit
 from spotifyapi import spotifyapi
 import json
 from noauthException import noauthException
@@ -7,6 +8,7 @@ import urllib
 import configparser
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 config = configparser.ConfigParser()
 configFilePath = './config.ini'
 config.read(configFilePath)
@@ -48,9 +50,19 @@ def auth2():
     # which is used to go back to page where authentication was started
     return redirect(prev_url, code=302)
 
+@socketio.on('updatesong')
+def handle_my_custom_event(methods=['GET', 'POST']):
+    current_song = spotifyapi.getCurrentlyPlaying()
+    socketio.emit('updatesong_response', current_song)
+
 @app.route('/search')
 def search():
     global prev_url
+    # set prev_url for redirect after authentication
+    prev_url = '/search'
+    # check if user is authenticated
+    if not spotifyapi.isAuthenticated():
+        return redirect(url_for('auth'))
     # add search bar
     html = '<form action="/search" method="get">'
     html += '<div class="input-group">'

@@ -107,3 +107,17 @@ function handleShift() {
     layoutName: shiftToggle
   });
 }
+
+// Update current played song
+var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+const interval = setInterval(function() {
+  socket.emit( 'updatesong', {} )
+}, 10000); // 10 seconds
+
+socket.on( 'connect', function() {
+  socket.emit( 'updatesong', {} )
+} )
+socket.on( 'updatesong_response', function( msg ) {
+  $('#current').text(msg)
+})
