@@ -2,10 +2,10 @@
 I was tired of saying "please make sure to not click on a song" when i was giving away my phone so someone else could add his favorite songs to the playback queue and then still fucking up the playback, so i decided to write a web interface (e.g. for the use on a tablet) for spotify that only allows adding songs to the queue.
 
 # Features
-- Add songs to queue
+- Add songs to queue (only works if spotify is actively playing)
 - List saved songs
 - List playlists (own + followed ones)
-      - list songs of specific playlist
+     - And all songs of a specific playlist
 - Transfer playback to another device
 
 # Planned features
@@ -14,8 +14,10 @@ I was tired of saying "please make sure to not click on a song" when i was givin
 - Get all saved songs (currently limited to 50)
 
 # Prerequisites
-- Python3 `sudo apt install python3 python3-pip`
-- flask and configparser `pip3 install flask ConfigParser`
+- Python3 
+     - `sudo apt install python3 python3-pip`
+- flask and configparser 
+     - `pip3 install flask ConfigParser`
 
 # Install
 1. Create a spotify application in the spotify [developer dashboard](https://developer.spotify.com/dashboard/applications)
