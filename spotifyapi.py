@@ -97,8 +97,6 @@ class spotifyapi:
             raise noauthException
 
     def getSavedTracks(self):
-        counter = 0
-        tracks = []
         if self.tracks:
             data = self.sendRequest('https://api.spotify.com/v1/me/tracks?limit=1')
             for track in data['items']:
@@ -108,6 +106,7 @@ class spotifyapi:
                 # there was no change made and we can use the local list
                 return self.tracks
         try:
+            counter = 0
             # while there are saved songs left to collect
             while True:
                 offset = counter * 50
@@ -124,13 +123,12 @@ class spotifyapi:
                     artist = track['track']['artists'][0]['name']
                     song = track['track']['name']
                     uri = track['track']['uri']
-                    tracks.append((artist, song, uri))
+                    self.tracks.append((artist, song, uri))
                 if not data['items']:
                     # break out of loop as all songs are collected
                     break
                 counter = counter + 1
-            self.tracks = tracks
-            return tracks
+            return self.tracks
         except noauthException:
             raise noauthException
 
@@ -147,7 +145,7 @@ class spotifyapi:
                     pass
 
                 for element in data['items']:
-                        self.playlists.append((element['id'], element['name']))
+                    self.playlists.append((element['id'], element['name']))
             except noauthException:
                 raise noauthException
         return self.playlists
