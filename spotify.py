@@ -10,7 +10,7 @@ app = Flask(__name__)
 config = configparser.ConfigParser()
 configFilePath = './config.ini'
 config.read(configFilePath)
-spotifyapi = spotifyapi(config.get('Spotify', 'client_id'), config.get('Spotify', 'client_secret'), config.get('Network', 'port'))
+spotifyapi = spotifyapi(config.get('Spotify', 'client_id'), config.get('Spotify', 'client_secret'), config.get('Network', 'redirect_uri'), config.get('Network', 'port'))
 prev_url='/'
 
 def coverImage(playlist_id):

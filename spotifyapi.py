@@ -8,8 +8,9 @@ from flask import redirect
 from noauthException import noauthException
 
 class spotifyapi:
-    def __init__(self, client_id, client_secret, _port):
-        self.port = _port
+    def __init__(self, client_id, client_secret, redirect_uri, port):
+        self.redirect_uri = redirect_uri
+        self.port = port
         self.client_id = client_id
         self.client_secret = client_secret
         self.authenticated = False
@@ -58,10 +59,10 @@ class spotifyapi:
     def authorize(self):
         permissions = ['user-modify-playback-state', 'playlist-read-private', 'user-read-playback-state', 'user-library-read']
         scope = '%20'.join(permissions)
-        return redirect('https://accounts.spotify.com/authorize?client_id='+self.client_id+'&response_type=code&redirect_uri=http://192.168.178.119:'+self.port+'/token&scope='+scope, code=302)
+        return redirect('https://accounts.spotify.com/authorize?client_id='+self.client_id+'&response_type=code&redirect_uri='+self.redirect_uri+':'+self.port+'/token&scope='+scope, code=302)
 
     def token(self, code):
-        body_params = {'grant_type' : 'authorization_code', 'code' : code, 'redirect_uri' : 'http://192.168.178.119:'+self.port+'/token'}
+        body_params = {'grant_type' : 'authorization_code', 'code' : code, 'redirect_uri' : self.redirect_uri+':'+self.port+'/token'}
         url='https://accounts.spotify.com/api/token'
 
         response=requests.post(url, data=body_params, auth = (self.client_id, self.client_secret))
