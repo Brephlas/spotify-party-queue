@@ -29,18 +29,14 @@ I was tired of saying "please make sure to not click on a song" when i was givin
 [Spotify]
 client_id = CLIENT_ID
 client_secret = CLIENT_SECRET
+
+[Network]
+redirect_uri = REDIRECT_URI
+port = PORT
 ```
 4. Run `python3 spotify.py`
-5. Open `http://<SERVERIP>:5000` in your browser
+5. Open `http://<SERVERIP>:<PORT>` in your browser
 6. Authorize the app to access your spotify data
-
-# Config
-## Change port
-Add your port to the line *app.run* function in `spotify.py`:
-```
-if __name__ == '__main__':
-      app.run(host='0.0.0.0', port=80)
-```
 
 # Screenshots
 
