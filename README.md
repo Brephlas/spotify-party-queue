@@ -12,7 +12,6 @@ I was tired of saying "please make sure to not click on a song" when i was givin
 # Planned features
 - Configurable list of playlists that should be listed
 - Configurable scope for authentication token / hide tracks or playlists completely
-- Get all saved songs (currently limited to 50)
 
 # Prerequisites
 - Python3 
