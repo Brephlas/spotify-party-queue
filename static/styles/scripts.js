@@ -8,6 +8,15 @@ function addSong(id, access_token) {
   Http.send();
 }
 
+function sendMatrix(song) {
+  const Http = new XMLHttpRequest();
+  const url='http://192.168.178.155';
+  Http.open("POST", url);
+  Http.setRequestHeader('Accept', 'application/x-www-form-urlencoded');
+  Http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  Http.send('lauftext='+song+'&wartenMs=50&helligkeit=3');
+}
+
 function toggleKeyboard() {
   var x = document.getElementById("keyboard");
   if (x.style.display === "none") {
@@ -52,36 +61,39 @@ function addInputClass(clicked_id) {
   document.getElementById("keyboard").style.display = "";
 }
 
+try {
+  let Keyboard = window.SimpleKeyboard.default;
 
-let Keyboard = window.SimpleKeyboard.default;
+  let keyboard = new Keyboard({
+    onChange: input => onChange(input),
+    onKeyPress: button => onKeyPress(button),
+    layout: {
+      'default': [
+        '` 1 2 3 4 5 6 7 8 9 0 - = {bksp}',
+        '{tab} q w e r t z u i o p [ ] \\',
+        '{lock} a s d f g h j k l ; \' {enter}',
+        '{shift} y x c v b n m , . / {shift}',
+        '.com @ {space}'
+      ],
+      'shift': [
+        '~ ! @ # $ % ^ & * ( ) _ + {bksp}',
+        '{tab} Q W E R T Z U I O P { } |',
+        '{lock} A S D F G H J K L : " {enter}',
+        '{shift} Y X C V B N M < > ? {shift}',
+        '.com @ {space}'
+      ]
+    }
+  });
 
-let keyboard = new Keyboard({
-  onChange: input => onChange(input),
-  onKeyPress: button => onKeyPress(button),
-  layout: {
-    'default': [
-      '` 1 2 3 4 5 6 7 8 9 0 - = {bksp}',
-      '{tab} q w e r t z u i o p [ ] \\',
-      '{lock} a s d f g h j k l ; \' {enter}',
-      '{shift} y x c v b n m , . / {shift}',
-      '.com @ {space}'
-    ],
-    'shift': [
-      '~ ! @ # $ % ^ & * ( ) _ + {bksp}',
-      '{tab} Q W E R T Z U I O P { } |',
-      '{lock} A S D F G H J K L : " {enter}',
-      '{shift} Y X C V B N M < > ? {shift}',
-      '.com @ {space}'
-    ]
-  }
-});
-
-/**
- * Update simple-keyboard when input is changed directly
- */
-document.querySelector(".input").addEventListener("input", event => {
-  keyboard.setInput(event.target.value);
-});
+  /**
+   * Update simple-keyboard when input is changed directly
+   */
+  document.querySelector(".input").addEventListener("input", event => {
+    keyboard.setInput(event.target.value);
+  });
+} catch (KEYBOARD_DOM_ERROR) {
+  ;
+}
 
 //console.log(keyboard);
 
@@ -120,4 +132,5 @@ socket.on( 'connect', function() {
 } )
 socket.on( 'updatesong_response', function( msg ) {
   $('#current').text(msg)
+  sendMatrix(msg)
 })
