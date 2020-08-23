@@ -156,7 +156,7 @@ def devices():
         if request.method == 'POST':
             device_id = request.form.get('device_id')
             spotifyapi.transferPlayback(device_id)
-            html = 'Transfered playback'
+            html += 'Transfered playback'
         devices_list = spotifyapi.getDevices()
         for device in devices_list:
             html += '<form action="/devices" method="POST">'
