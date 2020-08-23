@@ -106,6 +106,7 @@ class spotifyapi:
                 # there was no change made and we can use the local list
                 return self.tracks
         try:
+            self.tracks = []
             counter = 0
             # while there are saved songs left to collect
             while True:
@@ -171,8 +172,8 @@ class spotifyapi:
         requests.put('https://api.spotify.com/v1/me/player/play', headers=self.header)
 
     def getCurrentlyPlaying(self):
-        data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
         try:
+            data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
             artist = data['item']['artists'][0]['name']
             song = data['item']['name']
             return artist + ' - ' + song
