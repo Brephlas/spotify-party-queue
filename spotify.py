@@ -55,6 +55,11 @@ def handle_my_custom_event(methods=['GET', 'POST']):
     current_song = spotifyapi.getCurrentlyPlaying()
     socketio.emit('updatesong_response', current_song)
 
+@socketio.on('updateprogress')
+def handle_update_progress(methods=['GET', 'POST']):
+    current_progress = spotifyapi.getCurrentProgress()
+    socketio.emit('updateprogress_response', current_progress)
+
 @app.route('/search')
 def search():
     global prev_url
@@ -84,10 +89,12 @@ def search():
         if q is None or t is None:
             return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
         result = spotifyapi.search(q, t)
+        counter = 0
         for track in result:
             html += track[0]+' - '+track[1]
-            html += '<button class="btn btn-primary right" onclick="addSong(\''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
             html += '<hr>'
+            counter = counter + 1
         html += '<div>'
         return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
@@ -98,6 +105,7 @@ def tracks():
     global prev_url
     prev_url = '/tracks'
     html = '<div class="col-lg-12 mx-auto">'
+    counter = 0
     try:
         tracks = spotifyapi.getSavedTracks()
         html += '<h3 class="green">Here are your '+str(len(tracks))+' saved tracks</h3>'
@@ -105,9 +113,10 @@ def tracks():
         for track in tracks:
             html += '<div>'
             html += '<p style="overflow-wrap: break-word; display:inline;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button class="btn btn-primary right" onclick="addSong(\''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
             html += '</div>'
             html += '<hr>'
+            counter = counter + 1
         html += '<div>'
         return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
@@ -139,10 +148,12 @@ def playlisthandler():
     try:
         tracks = spotifyapi.getPlaylistTracks(playlist_id)
         html = ''
+        counter = 0
         for track in tracks:
             html += track[0]+' - '+track[1]
-            html += '<button class="btn btn-primary right" onclick="addSong(\''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
             html += '<hr>'
+            counter = counter + 1
         return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))

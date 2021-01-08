@@ -1,4 +1,6 @@
-function addSong(id, access_token) {
+function addSong(element_id, id, access_token) {
+  var button = document.getElementById(element_id);
+  button.disabled = true;
   const Http = new XMLHttpRequest();
   const url='https://api.spotify.com/v1/me/player/queue?uri='+id;
   Http.open("POST", url);
@@ -6,6 +8,7 @@ function addSong(id, access_token) {
   Http.setRequestHeader('Content-Type', 'application/json');
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
   Http.send();
+  $.notify("Added song to queue", "info");
 }
 
 function sendMatrix(song) {
@@ -36,15 +39,19 @@ window.addEventListener('click', function(e){
   } catch (e) {
     ;
   }
-  if (document.getElementById('keyboard').contains(e.target)){
-    // Clicked in box
-    //console.log('keyboard click')
-    return
-  }
-  if (document.getElementsByClassName('keyb')[0].contains(e.target)){
-    // Clicked in box
-    //console.log('keyboard click')
-    return
+  try {
+    if (document.getElementById('keyboard').contains(e.target)){
+      // Clicked in box
+      //console.log('keyboard click')
+      return
+    }
+    if (document.getElementsByClassName('keyb')[0].contains(e.target)){
+      // Clicked in box
+      //console.log('keyboard click')
+      return
+    }
+  } catch (e) {
+    ;
   }
   document.getElementById("keyboard").style.display = "none";
 });
@@ -125,6 +132,7 @@ var socket = io.connect('http://' + document.domain + ':' + location.port);
 
 const interval = setInterval(function() {
   socket.emit( 'updatesong', {} )
+  socket.emit( 'updateprogress', {} )
 }, 10000); // 10 seconds
 
 socket.on( 'connect', function() {
@@ -133,4 +141,15 @@ socket.on( 'connect', function() {
 socket.on( 'updatesong_response', function( msg ) {
   $('#current').text(msg)
   sendMatrix(msg)
+})
+
+const interval_progress = setInterval(function() {
+  socket.emit( 'updateprogress', {} )
+}, 5000); // 5 seconds
+
+socket.on( 'connect', function() {
+  socket.emit( 'updateprogress', {} )
+} )
+socket.on( 'updateprogress_response', function( msg ) {
+  $('#progress').attr('aria-valuenow', msg).css('width', msg+'%');
 })

@@ -180,6 +180,17 @@ class spotifyapi:
         except:
             return 'Nothing playing right now'
 
+    def getCurrentProgress(self):
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
+            progress = data['progress_ms']
+            song_id = data['item']['id']
+            data_track = self.sendRequest('https://api.spotify.com/v1/tracks/'+str(song_id))
+            track_length = data_track['duration_ms']
+            return str(100*float(progress)/float(track_length))
+        except:
+            return 'Nothing playing right now'
+
     def getDevices(self):
         try:
             data = self.sendRequest('https://api.spotify.com/v1/me/player/devices')
