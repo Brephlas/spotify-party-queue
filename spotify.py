@@ -22,7 +22,10 @@ def coverImage(playlist_id):
     # check if playlist_id has a stored cover image
     if not os.path.isfile('covers/'+str(playlist_id)+'.jpg'):
         cover_url = spotifyapi.getCoverImage(playlist_id)
-        urllib.request.urlretrieve(cover_url, 'covers/'+str(playlist_id)+'.jpg')
+        if cover_url:
+            urllib.request.urlretrieve(cover_url, 'covers/'+str(playlist_id)+'.jpg')
+        else:
+            return ''
     return 'covers/'+str(playlist_id)+'.jpg'
 
 @app.route('/covers/<path:filename>')
