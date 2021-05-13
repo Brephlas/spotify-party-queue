@@ -152,7 +152,10 @@ class spotifyapi:
 
     def getCoverImage(self, playlist_id):
         data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/images')
-        return data[0]['url']
+        if data:
+            return data[0]['url']
+        else:
+            return ''
 
     def getPlaylistTracks(self, playlist_id):
         try:
