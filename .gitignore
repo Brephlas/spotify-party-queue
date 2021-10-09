@@ -1,3 +1,4 @@
 *.pyc
 covers/*.jpg
+!covers/404.jpg
 config.ini

@@ -29,6 +29,46 @@ function toggleKeyboard() {
   }
 }
 
+window.onload = function () {
+  const toggle = document.getElementById("topnav_right_mode_toggle");
+  const theme = document.getElementById("stylesheet_toggle");
+  const selected = localStorage.getItem("css");
+  theme.href = selected;
+  var d = new Date();
+
+  if (localStorage.getItem("css") == null) {
+    // change theme based on time
+    if (d.getHours() >= 16 || d.getHours() < 8) {
+      theme.href = "/static/styles/styles.css";
+    } else {
+      theme.href = "/static/styles/styles_light.css";
+    }
+    localStorage.setItem("css", theme.href);
+  }
+
+  toggle.addEventListener("click", function () {
+    if (theme.getAttribute("href") == "/static/styles/styles_light.css") {
+        theme.href = "/static/styles/styles.css";
+    } else {
+        theme.href = "/static/styles/styles_light.css";
+    }
+    localStorage.setItem("css", theme.href);
+  });
+}
+
+var url = window.location.href.split("/"); //replace string with location.href
+var navLinks = document.getElementsByTagName("nav")[0].getElementsByTagName("a");
+//naturally you could use something other than the <nav> element
+var i=0;
+var currentPage = url[url.length - 1]
+for(i;i<navLinks.length;i++){
+  var lb = navLinks[i].href.split("/");
+  if(lb[lb.length-1] == currentPage) {
+    navLinks[i].classList.add("current");
+
+  }
+}
+
 window.addEventListener('click', function(e){
   try {
     if (document.getElementsByClassName('keyboard')[0].contains(e.target)){

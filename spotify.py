@@ -23,13 +23,17 @@ def coverImage(playlist_id):
     if not os.path.isfile('covers/'+str(playlist_id)+'.jpg'):
         cover_url = spotifyapi.getCoverImage(playlist_id)
         if cover_url:
-            urllib.request.urlretrieve(cover_url, 'covers/'+str(playlist_id)+'.jpg')
+            try:
+                urllib.request.urlretrieve(cover_url, 'covers/'+str(playlist_id)+'.jpg')
+            except urllib.error.HTTPError:
+                return 'covers/404.jpg'
         else:
-            return ''
+            return 'covers/404.jpg'
     return 'covers/'+str(playlist_id)+'.jpg'
 
 @app.route('/covers/<path:filename>')
 def covers(filename):
+    print(filename)
     return send_from_directory('covers/', filename)
 
 @app.route('/')
@@ -76,14 +80,14 @@ def search():
     html += '<div class="input-group">'
     html += '<input id="1" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name=\'q\'/>'
     html += '<input type="hidden" name="type" value="track"/>'
-    html += '<button type="submit" class="btn btn-sp">Success</button>'
+    html += '<button type="submit" class="btn btn-sp">Search</button>'
     html += '</div>'
     html += '</form>'
     html += '<hr id="hr" style="display: none;">'
     html += '<div id="keyboard" style="display: none; margin-left:auto; margin-right:auto;" class="simple-keyboard"></div>'
     html += '<hr>'
     # add search content
-    html += '<div class="col-lg-11 mx-auto">'
+    html += '<div class="col-lg-13 mx-auto">'
     q = request.args.get('q')
     t = request.args.get('type')
     prev_url = '/search?q='+str(q)+'&type='+str(t)
@@ -94,7 +98,8 @@ def search():
         result = spotifyapi.search(q, t)
         counter = 0
         for track in result:
-            html += track[0]+' - '+track[1]
+            html += '<img width="40" height="40" src="'+track[3]+'"/>'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
             html += '<hr>'
             counter = counter + 1
@@ -115,7 +120,8 @@ def tracks():
         html += '<hr>'
         for track in tracks:
             html += '<div>'
-            html += '<p style="overflow-wrap: break-word; display:inline;">'+track[0]+' - '+track[1]+'</p>'
+            html += '<img width="40" height="40" src="'+track[3]+'"/>'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
             html += '</div>'
             html += '<hr>'
@@ -153,7 +159,8 @@ def playlisthandler():
         html = ''
         counter = 0
         for track in tracks:
-            html += track[0]+' - '+track[1]
+            html += '<img width="40" height="40" src="'+track[3]+'"/>'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
             html += '<hr>'
             counter = counter + 1

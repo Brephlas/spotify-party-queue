@@ -91,9 +91,10 @@ class spotifyapi:
                 artist = track['artists'][0]['name']
                 song = track['name']
                 uri = track['uri']
-                tracks.append((artist, song, uri))
+                cover_url = track['album']['images'][0]['url']
+                tracks.append((artist, song, uri, cover_url))
             return tracks
-        except (noauthException, KeyError):
+        except (noauthException):
             raise noauthException
 
     def getSavedTracks(self):
@@ -124,7 +125,8 @@ class spotifyapi:
                     artist = track['track']['artists'][0]['name']
                     song = track['track']['name']
                     uri = track['track']['uri']
-                    self.tracks.append((artist, song, uri))
+                    cover_url = track['track']['album']['images'][0]['url']
+                    self.tracks.append((artist, song, uri, cover_url))
                 if not data['items']:
                     # break out of loop as all songs are collected
                     break
@@ -166,7 +168,8 @@ class spotifyapi:
                 artist = element['track']['album']['artists'][0]['name']
                 song = element['track']['name']
                 uri = element['track']['uri']
-                tracks.append((artist, song, uri))
+                cover_url = element['track']['album']['images'][0]['url']
+                tracks.append((artist, song, uri, cover_url))
             return tracks
         except noauthException:
             raise noauthException
@@ -213,7 +216,7 @@ class spotifyapi:
             raise noauthException
 
     def transferPlayback(self, device_id):
-        # create llist first because spotify web api want it this way
+        # create list first because spotify web api want it this way
         device_ids = []
         device_ids.append(device_id)
         d = {'device_ids': device_ids}
