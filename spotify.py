@@ -8,6 +8,7 @@ import urllib
 import configparser
 
 app = Flask(__name__)
+app.config.from_pyfile('spotify.cfg', silent=True)
 socketio = SocketIO(app)
 config = configparser.ConfigParser()
 configFilePath = './config.ini'
@@ -109,6 +110,9 @@ def search():
 @app.route('/tracks')
 def tracks():
     global prev_url
+    # return to previous URL if Tracks are disabled
+    if not app.config.get("TRACKS"):
+        return redirect(prev_url, code=302)
     prev_url = '/tracks'
     html = '<div class="col-lg-12 mx-auto">'
     counter = 0
