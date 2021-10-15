@@ -17,6 +17,7 @@ class spotifyapi:
         self.header = {'Accept' : 'application/json', 'Content-Type' : 'application/json'}
         self.playlists = []
         self.tracks = [] # helper for storing saved tracks
+        self.playlist_tracks = {} # helper for storing tracks of playlists
 
     def setHeader(self, token):
         self.header = {'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token}
@@ -147,11 +148,44 @@ class spotifyapi:
                 except KeyError:
                     pass
 
+                playlist_hidden = []
+                try:
+                    with open('.playlist_hidden', 'r') as playlist_hidden_read:
+                        for line in playlist_hidden_read:
+                            playlist_hidden.append(line.strip())
+                except FileNotFoundError:
+                    with open('.playlist_hidden', 'w+') as playlist_hidden_write:
+                        playlist_hidden_write.write('')
+
                 for element in data['items']:
-                    self.playlists.append((element['id'], element['name']))
+                    # only add playlist to returned list of playlist
+                    # if it is not in the hidden list
+                    if element['id'] not in playlist_hidden:
+                        self.playlists.append((element['id'], element['name'], element['tracks']['total']))
             except noauthException:
                 raise noauthException
         return self.playlists
+
+    def getAllPlaylists(self):
+        allPlaylists = []
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/me/playlists')
+
+            # check if auth token is missing
+            try:
+                if data['error']['message']:
+                    raise noauthException
+            except KeyError:
+                pass
+
+
+            for element in data['items']:
+                # only add playlist to returned list of playlist
+                # if it is not in the hidden list
+                allPlaylists.append((element['id'], element['name'], element['tracks']['total']))
+        except noauthException:
+            raise noauthException
+        return allPlaylists
 
     def getCoverImage(self, playlist_id):
         data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/images')
@@ -161,16 +195,41 @@ class spotifyapi:
             return ''
 
     def getPlaylistTracks(self, playlist_id):
+        if playlist_id in self.playlist_tracks:
+            data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks?limit=1')
+            for track in data['items']:
+                uri = track['track']['uri']
+            if uri == self.playlist_tracks[playlist_id][0][2]:
+                # if the first local stored song matches with the api's first stored song
+                # there was no change made and we can use the local list
+                return self.playlist_tracks[playlist_id]
         try:
-            data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks')
-            tracks = []
-            for element in data['items']:
-                artist = element['track']['album']['artists'][0]['name']
-                song = element['track']['name']
-                uri = element['track']['uri']
-                cover_url = element['track']['album']['images'][0]['url']
-                tracks.append((artist, song, uri, cover_url))
-            return tracks
+            self.playlist_tracks = {}
+            self.playlist_tracks[playlist_id] = []
+            counter = 0
+            # while there are saved songs left to collect
+            while True:
+                offset = counter * 50
+                data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks?limit=50&offset='+str(offset))
+                
+                # check if auth token is missing
+                try:
+                    if data['error']['message']:
+                        raise noauthException
+                except KeyError:
+                    pass
+
+                for track in data['items']:
+                    artist = track['track']['artists'][0]['name']
+                    song = track['track']['name']
+                    uri = track['track']['uri']
+                    cover_url = track['track']['album']['images'][0]['url']
+                    self.playlist_tracks[playlist_id].append((artist, song, uri, cover_url))
+                if not data['items']:
+                    # break out of loop as all songs are collected
+                    break
+                counter = counter + 1
+            return self.playlist_tracks[playlist_id]
         except noauthException:
             raise noauthException
 
@@ -197,10 +256,11 @@ class spotifyapi:
         except:
             return 'Nothing playing right now'
 
-    def getDevices(self):
+    def getAvailableDevices(self):
         try:
+            # request current devices of the user
             data = self.sendRequest('https://api.spotify.com/v1/me/player/devices')
-            devices = []
+            devices_from_api = []
 
             # check if auth token is missing
             try:
@@ -210,7 +270,46 @@ class spotifyapi:
                 pass
             
             for element in data['devices']:
-                devices.append((element['name'], element['id']))
+                devices_from_api.append((element['name'], element['id']))
+
+            # return list of devices
+            return data['devices']
+        except noauthException:
+            raise noauthException
+
+    def getAllDevices(self):
+        devices = []
+        try:
+            # read devices from local file
+            with open('.devices', 'r') as devices_read:
+                for line in devices_read:
+                    name, player_id = line.strip().split(' ')
+                    devices.append((name, player_id))
+
+            # request current devices of the user
+            data = self.sendRequest('https://api.spotify.com/v1/me/player/devices')
+            devices_from_api = []
+
+            # check if auth token is missing
+            try:
+                if data['error']['message']:
+                    raise noauthException
+            except KeyError:
+                pass
+            
+            for element in data['devices']:
+                devices_from_api.append((element['name'], element['id']))
+
+            # check if new devices are available
+            # merge both lists
+            devices = devices + list(set(devices_from_api) - set(devices))
+
+            # store devices to local file
+            with open('.devices', 'w+') as devices_write:
+                for device in devices:
+                    devices_write.write("%s %s\n" % (device))
+            
+            # return list of devices
             return devices
         except noauthException:
             raise noauthException
