@@ -283,7 +283,7 @@ class spotifyapi:
             # read devices from local file
             with open('.devices', 'r') as devices_read:
                 for line in devices_read:
-                    name, player_id = line.strip().split(' ')
+                    name, player_id = line.strip().rsplit(' ', 1)
                     devices.append((name, player_id))
 
             # request current devices of the user
