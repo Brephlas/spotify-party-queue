@@ -18,6 +18,9 @@ class spotifyapi:
         self.playlists = []
         self.tracks = [] # helper for storing saved tracks
         self.playlist_tracks = {} # helper for storing tracks of playlists
+        self.played_previously = []
+        self.play_next = []
+        self.currently_playing = ''
 
     def setHeader(self, token):
         self.header = {'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token}
@@ -86,7 +89,7 @@ class spotifyapi:
         if not q or not t or q == 'None' or t == 'None':
             return ''
         try:
-            data = self.sendRequest('https://api.spotify.com/v1/search?q='+str(q)+'&type='+str(t)+'&limit=10')
+            data = self.sendRequest('https://api.spotify.com/v1/search?q='+str(q)+'&type='+str(t)+'&limit=20')
             tracks = []
             for track in data['tracks']['items']:
                 artist = track['artists'][0]['name']
@@ -241,9 +244,23 @@ class spotifyapi:
             data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
             artist = data['item']['artists'][0]['name']
             song = data['item']['name']
+            current_song = artist + ' - ' + song
+            ## add song to local variable as well as previous list,
+            # since this means the song has changed
+            if self.currently_playing != current_song:
+                self.currently_playing = current_song
+                if current_song not in self.played_previously:
+                    self.played_previously.append(current_song)
+                # also remove song from next-up list
+                if current_song in self.play_next:
+                    self.play_next.remove(current_song)
             return artist + ' - ' + song
         except:
             return 'Nothing playing right now'
+
+    def addNextSong(self, name):
+        if name not in self.play_next:
+            self.play_next.append(name)
 
     def getCurrentProgress(self):
         try:

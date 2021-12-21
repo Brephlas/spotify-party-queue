@@ -6152,13 +6152,13 @@ a.close.disabled {
 }
 
 .bg-primary {
-  background-color: #494EA5 !important;
+  background-color: #15883d !important;
 }
 
 a.bg-primary:hover, a.bg-primary:focus,
 button.bg-primary:hover,
 button.bg-primary:focus {
-  background-color: #353983 !important;
+  background-color: #10632d !important;
 }
 
 .bg-secondary {

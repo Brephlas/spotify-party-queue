@@ -10556,3 +10556,10 @@ a:active {
   background: transparent !important;
   transition: all 0.3s ease 0s !important;
 }
+
+.center {
+  margin: auto;
+  width: 50%;
+  border: 3px solid green;
+  padding: 10px;
+}

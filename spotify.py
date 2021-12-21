@@ -1,20 +1,28 @@
-from flask import Flask, escape, request, redirect, render_template, url_for, send_from_directory, jsonify
+from flask import Flask, escape, request, redirect, render_template, url_for, send_from_directory, jsonify, session
 from flask_socketio import SocketIO, send, emit
+from flask_session import Session
 from spotifyapi import spotifyapi
 import json
 from noauthException import noauthException
 import os
 import urllib
 import configparser
+import redis
+import urllib.parse
 
 app = Flask(__name__)
 app.config.from_pyfile('spotify.cfg', silent=True)
 socketio = SocketIO(app)
+socketio.init_app(app, cors_allowed_origins="*")
 config = configparser.ConfigParser()
 configFilePath = './config.ini'
 config.read(configFilePath)
 spotifyapi = spotifyapi(config.get('Spotify', 'client_id'), config.get('Spotify', 'client_secret'), config.get('Network', 'redirect_uri'), config.get('Network', 'port'))
 prev_url='/'
+
+# redis session
+#app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
+#server_session = Session(app)
 
 def coverImage(playlist_id):
     # make sure covers folder exists
@@ -32,16 +40,17 @@ def coverImage(playlist_id):
             return 'covers/404.jpg'
     return 'covers/'+str(playlist_id)+'.jpg'
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect('/', code=302)
+
 @app.route('/covers/<path:filename>')
 def covers(filename):
-    return send_from_directory('covers/', filename)
-
-@app.route('/')
-def template():
-    if spotifyapi.isAuthenticated():
-        return redirect('/search', code=302)
+    file_exists = os.path.isfile('covers/'+str(filename))
+    if file_exists:
+        return send_from_directory('covers/', filename)
     else:
-        return redirect(url_for('auth'))
+        return send_from_directory('covers/404.jpg')
 
 @app.route('/auth')
 def auth():
@@ -66,16 +75,22 @@ def handle_update_progress(methods=['GET', 'POST']):
     current_progress = spotifyapi.getCurrentProgress()
     socketio.emit('updateprogress_response', current_progress)
 
-@app.route('/search')
+@app.route('/addNextSong', methods=['POST'])
+def addNextSong():
+    name = request.form.get('name')
+    spotifyapi.addNextSong(name)
+    return 'Ok'
+
+@app.route('/')
 def search():
     global prev_url
     # set prev_url for redirect after authentication
-    prev_url = '/search'
+    prev_url = '/'
     # check if user is authenticated
     if not spotifyapi.isAuthenticated():
         return redirect(url_for('auth'))
     # add search bar
-    html = '<form action="/search" method="get">'
+    html = '<form action="/" method="get">'
     html += '<div class="input-group">'
     html += '<input id="1" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name=\'q\'/>'
     html += '<input type="hidden" name="type" value="track"/>'
@@ -89,7 +104,7 @@ def search():
     html += '<div class="col-lg-13 mx-auto">'
     q = request.args.get('q')
     t = request.args.get('type')
-    prev_url = '/search?q='+str(q)+'&type='+str(t)
+    prev_url = '/?q='+str(q)+'&type='+str(t)
     try:
         # error handling
         if q is None or t is None:
@@ -99,10 +114,45 @@ def search():
         for track in result:
             html += '<img width="40" height="40" src="'+track[3]+'"/>'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')">Add to queue</button>'
             html += '<hr>'
             counter = counter + 1
         html += '<div>'
+        return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
+    except noauthException:
+        return redirect(url_for('auth'))
+
+@app.route('/current')
+def template():
+    try:
+        html = '<h5>'
+        html += '<div style="display: inline-block; width: 100%; opacity: 0.4;">'
+        html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">Previously</p>'
+
+        html += '<p class="right" style="overflow-wrap: break-word; display:inline; padding-right: 10px;">'
+        for song in spotifyapi.played_previously[-6:-1]:
+            html += urllib.parse.unquote_plus(song)+'<br>'
+        if len(spotifyapi.played_previously[-6:-1]) == 0:
+            html += 'Restarted shortly. Will display previous songs after the next one finished'
+        html += '</p>'
+        html += '</div>'
+        html += '<br>'
+        html += '<div style="display: inline-block; width: 100%;">'
+        html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">Currently Playing</p>'
+        html += '<div class="right center"><p id="current_mainpage">'+spotifyapi.getCurrentlyPlaying()+'</p></div>'
+        html += '</div>'
+        html += '<br>'
+        html += '<div style="display: inline-block; width: 100%; opacity: 0.4;">'
+        html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">Next up</p>'
+        html += '<p class="right" style="overflow-wrap: break-word; display:inline; padding-right: 10px;">'
+        for song in spotifyapi.play_next:
+            html += urllib.parse.unquote_plus(song)+'<br>'
+        if len(spotifyapi.play_next) == 0:
+            html += 'No songs in queue currently'
+        html += '</p>'
+        html += '</div>'
+        html += '<br>'
+        html += '</h5>'
         return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))
@@ -124,7 +174,7 @@ def tracks():
             html += '<div>'
             html += '<img width="40" height="40" src="'+track[3]+'"/>'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')">Add to queue</button>'
             html += '</div>'
             html += '<hr>'
             counter = counter + 1
@@ -206,7 +256,7 @@ def playlisthandler():
         for track in tracks:
             html += '<img width="40" height="40" src="'+track[3]+'"/>'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+urllib.parse.quote_plus(track[0])+' - '+urllib.parse.quote_plus(track[1])+'\')">Add to queue</button>'
             html += '<hr>'
             counter = counter + 1
         return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
