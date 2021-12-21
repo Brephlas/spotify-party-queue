@@ -8,10 +8,7 @@ I was tired of saying "please make sure to not click on a song" when i was givin
      - And all songs of a specific playlist
 - Transfer playback to another device
 - Keyboard for search bar (used [simple-keyboard](https://hodgef.com/simple-keyboard/))
-
-# Planned features
-- Configurable list of playlists that should be listed
-- Configurable scope for authentication token / hide tracks or playlists completely
+- Ability to (un)hide specific playlists permanently
 
 # Prerequisites
 - Python3 

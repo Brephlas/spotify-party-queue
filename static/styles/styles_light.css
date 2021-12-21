@@ -64,9 +64,9 @@ body {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #858a8f;
+  color: #212529;
   text-align: left;
-  background-color: rgb(0, 0, 0);
+  background-color: #fff;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -88,9 +88,6 @@ hr {
   box-sizing: content-box;
   height: 0;
   overflow: visible;
-  border-top: 1px solid #ffffff;
-  display: inline-block;
-  width: 100%;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -173,7 +170,7 @@ sup {
 }
 
 a {
-  color: #1abc9c;
+  color: #17a2b8;
   text-decoration: none;
   background-color: transparent;
 }
@@ -436,8 +433,14 @@ hr {
   margin-top: 1rem;
   margin-bottom: 1rem;
   border: 0;
-  /*border-top: 0.125rem solid rgba(0, 0, 0, 0.1);*/
-  border-top: 1px solid #797979;
+  border-top: 0.125rem solid rgba(0, 0, 0, 0.1);
+}
+
+hr.item {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 0;
+  border-top: 0.025rem solid rgba(0, 0, 0, 0.1);
 }
 
 small,
@@ -2036,7 +2039,7 @@ pre code {
 .form-control:focus {
   color: #495057;
   background-color: #fff;
-  border-color: #1DB954;
+  border-color: #494EA5;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(26, 188, 156, 0.25);
 }
@@ -2485,28 +2488,27 @@ fieldset:disabled a.btn {
 }
 
 .btn-primary {
-  color: #fff;
+  color: #000000;
   /*background-color: #1abc9c;
   border-color: #1abc9c;*/
   background-color: #1DB954;
   border-color: #1DB954;
 }
 .btn-primary:hover {
-  color: #fff;
+  color: #ffffff;
   /*background-color: #159a80;
   border-color: #148f77;*/
   background-color: #189745;
   border-color: #189745;
 }
 .btn-primary:focus, .btn-primary.focus {
-  color: #fff;
-  background-color: #0d4d23;
-  border-color: #0d4d23;
+  color: #000000;
+  background-color: #004117;
+  border-color: #004117;
   box-shadow: 0 0 0 0.2rem rgba(60, 198, 171, 0.5);
 }
 .btn-primary.disabled, .btn-primary:disabled {
-  /*visibility: hidden;*/
-  content: 'Added';
+  visibility: hidden;
   color: rgb(0, 0, 0);
   background-color: #004117;
   border-color: #004117;
@@ -2581,7 +2583,7 @@ fieldset:disabled a.btn {
 }
 
 .btn-sp {
-  color: #fff;
+  color: rgb(0, 0, 0);
   background-color: #1DB954;
   border-color: #1DB954;
   outline: 0 !important;
@@ -6150,18 +6152,18 @@ a.close.disabled {
 }
 
 .bg-primary {
-  background-color: #1DB954 !important;
+  background-color: #15883d !important;
 }
 
 a.bg-primary:hover, a.bg-primary:focus,
 button.bg-primary:hover,
 button.bg-primary:focus {
-  background-color: #189745 !important;
+  background-color: #10632d !important;
 }
 
 .bg-secondary {
   /*background-color: #2c3e50 !important;*/
-  background-color: #141414 !important;
+  background-color: #191414 !important;
 }
 
 a.bg-secondary:hover, a.bg-secondary:focus,
@@ -6185,7 +6187,7 @@ button.bg-success:focus {
 }
 
 .spbg {
-  background-color: #191414; 
+  background-color: #191414;
 }
 
 .green {
@@ -6193,7 +6195,12 @@ button.bg-success:focus {
 }
 
 .green2 {
-  color: #189745;
+  color: #15883d;
+}
+
+.blue {
+  /*color: #2a2c68;*/
+  color: rgba(50, 48, 165, 0.75);
 }
 
 .white {
@@ -6201,7 +6208,7 @@ button.bg-success:focus {
 }
 
 .black {
-  color: #fff;
+  color: #000;
 }
 
 a.bg-info:hover, a.bg-info:focus,
@@ -9877,15 +9884,17 @@ button.bg-dark:focus {
 }
 
 .text-white {
-  color: #fff !important;
+  color: #000 !important;
 }
 
 .text-primary {
-  color: #1abc9c !important;
+  color: #1a2abc !important;
+  /*color: #1abc9c !important;*/
 }
 
 a.text-primary:hover, a.text-primary:focus {
-  color: #117964 !important;
+  color: #112179 !important;
+  /*color: #117964 !important;*/
 }
 
 .text-secondary {
@@ -9905,7 +9914,8 @@ a.text-success:hover, a.text-success:focus {
 }
 
 .text-info {
-  color: #17a2b8 !important;
+  /*color: #2d3064 !important;*/
+  color: rgba(41, 39, 129, 0.75);
 }
 
 a.text-info:hover, a.text-info:focus {
@@ -10328,7 +10338,7 @@ h3 {
 }
 
 .floating-label-form-group-with-focus label {
-  color: #1DB954;
+  color: #494EA5;
 }
 
 form .row:first-child .floating-label-form-group {
@@ -10368,6 +10378,10 @@ form .row:first-child .floating-label-form-group {
 
 body { padding-top: 70px; }
 
+.tab { margin-left: 40px; }
+
+.p { display: inline; }
+
 
 input {
   width: 100%;
@@ -10383,14 +10397,13 @@ input {
 }
 
 .hg-button {
-  color: #1DB954;
+  /*color: white;*/
   background: black !important;
 }
 
 .hg-theme-default {
   background-color: black !important;
 }
-
 
 .input-group .form-control {
   margin: 0px !important;
@@ -10401,23 +10414,7 @@ input {
 }
 
 .datepicker {
-  background-color: #343a40;
-  border-color: #454d55;
-  color: white;
-}
-
-.datepicker:focus {
-  background-color: #343a40;
-  border-color: #5c656d;
-}
-
-option {
-  color: #2d3064;
-  background-color: black;
-}
-
-::selection {
-  background: #3f3f3f; /* WebKit/Blink Browsers */
+  border: 1px black;
 }
 
 /* new button style */
@@ -10555,11 +10552,4 @@ a:active {
   border-radius: 40px !important;
   background: transparent !important;
   transition: all 0.3s ease 0s !important;
-}
-
-.center {
-  margin: auto;
-  width: 50%;
-  border: 3px solid green;
-  padding: 10px;
 }
