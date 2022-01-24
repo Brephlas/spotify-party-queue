@@ -142,7 +142,7 @@ class spotifyapi:
     def getPlaylists(self):
         if not self.playlists:
             try:
-                data = self.sendRequest('https://api.spotify.com/v1/me/playlists')
+                data = self.sendRequest('https://api.spotify.com/v1/me/playlists?limit=50')
 
                 # check if auth token is missing
                 try:
