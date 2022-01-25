@@ -140,9 +140,57 @@ class spotifyapi:
             raise noauthException
 
     def getPlaylists(self):
+        if self.playlists:
+            data = self.sendRequest('https://api.spotify.com/v1/me/playlists?limit=1')
+            if data['items'][0]['id'] == self.playlists[0][0]:
+                # if the first local stored song matches with the api's first stored song
+                # there was no change made and we can use the local list
+                return self.playlists
         if not self.playlists:
             try:
-                data = self.sendRequest('https://api.spotify.com/v1/me/playlists?limit=50')
+                counter = 0
+                # while there are saved songs left to collect
+                while True:
+                    offset = counter * 20
+                    data = self.sendRequest('https://api.spotify.com/v1/me/playlists?limit=20&offset='+str(offset))
+
+                    # check if auth token is missing
+                    try:
+                        if data['error']['message']:
+                            raise noauthException
+                    except KeyError:
+                        pass
+
+                    playlist_hidden = []
+                    try:
+                        with open('.playlist_hidden', 'r') as playlist_hidden_read:
+                            for line in playlist_hidden_read:
+                                playlist_hidden.append(line.strip())
+                    except FileNotFoundError:
+                        with open('.playlist_hidden', 'w+') as playlist_hidden_write:
+                            playlist_hidden_write.write('')
+
+                    for element in data['items']:
+                        # only add playlist to returned list of playlist
+                        # if it is not in the hidden list
+                        if element['id'] not in playlist_hidden:
+                            self.playlists.append((element['id'], element['name'], element['tracks']['total']))
+                    if not data['items']:
+                        # break out of loop as all songs are collected
+                        break
+                    counter = counter + 1
+            except noauthException:
+                raise noauthException
+        return self.playlists
+
+    def getAllPlaylists(self):
+        allPlaylists = []
+        try:
+            counter = 0
+            # while there are saved songs left to collect
+            while True:
+                offset = counter * 20
+                data = self.sendRequest('https://api.spotify.com/v1/me/playlists?limit=20&offset='+str(offset))
 
                 # check if auth token is missing
                 try:
@@ -151,41 +199,14 @@ class spotifyapi:
                 except KeyError:
                     pass
 
-                playlist_hidden = []
-                try:
-                    with open('.playlist_hidden', 'r') as playlist_hidden_read:
-                        for line in playlist_hidden_read:
-                            playlist_hidden.append(line.strip())
-                except FileNotFoundError:
-                    with open('.playlist_hidden', 'w+') as playlist_hidden_write:
-                        playlist_hidden_write.write('')
-
                 for element in data['items']:
                     # only add playlist to returned list of playlist
                     # if it is not in the hidden list
-                    if element['id'] not in playlist_hidden:
-                        self.playlists.append((element['id'], element['name'], element['tracks']['total']))
-            except noauthException:
-                raise noauthException
-        return self.playlists
-
-    def getAllPlaylists(self):
-        allPlaylists = []
-        try:
-            data = self.sendRequest('https://api.spotify.com/v1/me/playlists')
-
-            # check if auth token is missing
-            try:
-                if data['error']['message']:
-                    raise noauthException
-            except KeyError:
-                pass
-
-
-            for element in data['items']:
-                # only add playlist to returned list of playlist
-                # if it is not in the hidden list
-                allPlaylists.append((element['id'], element['name'], element['tracks']['total']))
+                    allPlaylists.append((element['id'], element['name'], element['tracks']['total']))
+                if not data['items']:
+                    # break out of loop as all songs are collected
+                    break
+                counter = counter + 1
         except noauthException:
             raise noauthException
         return allPlaylists
