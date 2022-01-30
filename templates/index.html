@@ -23,6 +23,15 @@
     <link rel="shortcut icon" href="{{ url_for('static',filename='assets/img/favicon.svg') }}" />
   </head>
   <body>
+    {% if config["SOCKET"] == True %}
+        <script>
+            var SOCKET = true;
+        </script>
+    {% else %}
+        <script>
+            var SOCKET = false;
+        </script>
+    {% endif %}
     <div class="container-scroller">
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -88,6 +97,9 @@
                 <button type="submit" class="btn btn-success">Search</button>
                 </div>
                 </form>
+              </li>
+              <li>
+                <p id="current" class="mid green2" onclick="location.href='/current'">{{ current | safe }}</p>
               </li>
             </ul>
             <ul class="navbar-nav navbar-nav-right">
