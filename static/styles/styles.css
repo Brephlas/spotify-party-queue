@@ -2488,8 +2488,8 @@ fieldset:disabled a.btn {
   color: #fff;
   /*background-color: #1abc9c;
   border-color: #1abc9c;*/
-  background-color: #1DB954;
-  border-color: #1DB954;
+  background-color: #1DB954 !important;
+  border-color: #1DB954 !important;
 }
 .btn-primary:hover {
   color: #fff;
@@ -10364,6 +10364,7 @@ form .row:first-child .floating-label-form-group {
   padding: 20px;
   font-size: 30px;
   text-align: center;
+  color:rgb(0, 0, 0, 0) !important;
 }
 
 body { padding-top: 70px; }

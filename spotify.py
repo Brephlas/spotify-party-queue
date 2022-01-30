@@ -20,6 +20,9 @@ config.read(configFilePath)
 spotifyapi = spotifyapi(config.get('Spotify', 'client_id'), config.get('Spotify', 'client_secret'), config.get('Network', 'redirect_uri'), config.get('Network', 'port'))
 prev_url='/'
 
+style_start = '<div class="row"><div class="col-12 grid-margin stretch-card"><div class="card"><div class="card-body">'
+style_end = '</div></div></div></div>'
+
 # redis session
 #app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
 #server_session = Session(app)
@@ -94,7 +97,7 @@ def search():
     html += '<div class="input-group">'
     html += '<input id="1" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name=\'q\'/>'
     html += '<input type="hidden" name="type" value="track"/>'
-    html += '<button type="submit" class="btn btn-sp">Search</button>'
+    html += '<button type="submit" class="btn btn-success">Search</button>'
     html += '</div>'
     html += '</form>'
     html += '<hr id="hr" style="display: none;">'
@@ -114,13 +117,14 @@ def search():
         for track in result:
             html += '<img width="40" height="40" src="'+track[3]+'"/>'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')">Add to queue</button>'
             html += '<hr>'
             counter = counter + 1
         html += '<div>'
-        return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))
+    finally:
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
 
 @app.route('/current')
 def template():
@@ -168,18 +172,17 @@ def tracks():
     counter = 0
     try:
         tracks = spotifyapi.getSavedTracks()
-        html += '<h3 class="green">Here are your '+str(len(tracks))+' saved tracks</h3>'
+        html += '<h3 class="green card-title">Here are your '+str(len(tracks))+' saved tracks</h3>'
         html += '<hr>'
         for track in tracks:
             html += '<div>'
             html += '<img width="40" height="40" src="'+track[3]+'"/>'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')">Add to queue</button>'
             html += '</div>'
             html += '<hr>'
             counter = counter + 1
-        html += '<div>'
-        return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))
 
@@ -188,13 +191,18 @@ def playlists():
     global prev_url
     prev_url = '/playlists'
     try:
-        html = '<div class="grid-container">'
+        html = ''
         playlists = spotifyapi.getPlaylists()
+        html += '<div class="row">'
         for playlist in playlists:
             cover_path = coverImage(playlist[0])
-            html += '<div class="grid-item">'
+            html += '<div class="col-sm-4 grid-margin">'
+            html += '<div class="card">'
+            html += '<div class="card-body">'
             html += '<p>'+playlist[1]+'</p>'
-            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'&name='+playlist[1]+'"><img width="300" height="300" src="'+cover_path+'"/></a>'
+            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'&name='+playlist[1]+'"><img class="responsive" src="'+cover_path+'"/></a>'
+            html += '</div>'
+            html += '</div>'
             html += '</div>'
         html += '</div>'
         return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
@@ -236,7 +244,7 @@ def hideplaylists():
             html += '<input type="hidden" name="playlist_total_tracks" value="'+str(playlist[2])+'">'
             html += '</form>'
             html += '<hr>'
-        return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))
 
@@ -256,10 +264,10 @@ def playlisthandler():
         for track in tracks:
             html += '<img width="40" height="40" src="'+track[3]+'"/>'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button id="'+str(counter)+'" class="btn btn-primary right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+urllib.parse.quote_plus(track[0])+' - '+urllib.parse.quote_plus(track[1])+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+urllib.parse.quote_plus(track[0])+' - '+urllib.parse.quote_plus(track[1])+'\')">Add to queue</button>'
             html += '<hr>'
             counter = counter + 1
-        return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))
 
@@ -314,7 +322,7 @@ def devices():
         html += '<h4>Available Devices</h4>'
         for device in devices_list:
             html += '<form action="/devices" method="POST">'
-            html += '<button type="submit" class="btn btn-sp mid black">' + device['name'] + '</button>'
+            html += '<button type="submit" class="btn btn-info mid black">' + device['name'] + '</button>'
             html += '<input type="hidden" name="device_id" value="'+device['id']+'">'
             html += '<br>'
             html += 'Volume: '+str(device['volume_percent'])
@@ -328,11 +336,11 @@ def devices():
         devices_list = spotifyapi.getAllDevices()
         for device in devices_list:
             html += '<form action="/devices" method="POST">'
-            html += '<button type="submit" class="btn btn-sp mid black">' + device[0] + '</button>'
+            html += '<button type="submit" class="btn btn-info mid black">' + device[0] + '</button>'
             html += '<input type="hidden" name="device_id" value="'+device[1]+'">'
             html += '</form>'
             html += '<br>'
         html += '</div>'
-        return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))
