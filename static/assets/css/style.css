@@ -11075,6 +11075,8 @@ input[type="button"].btn-block {
   flex-wrap: wrap;
   padding-left: 0;
   margin-bottom: 0;
+  position:fixed;
+  width:inherit;
   list-style: none; }
 
 .nav-link {

@@ -8,16 +8,19 @@ function addSong(element_id, id, access_token, song_name) {
   Http.setRequestHeader('Content-Type', 'application/json');
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
   Http.send();
-  $.notify("Added song to queue", "info");
+  // show notification
+  $.notify(song_name + " added to queue", {globalPosition: 'bottom center', className:"success"});
   // Update next_songs list
   Http = new XMLHttpRequest();
   url=location.protocol + '//' + document.domain + ':' + location.port + '/addNextSong';
   Http.open("POST", url);
   Http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  console.log(song_name)
+  //console.log(song_name)
   Http.send('name='+encodeURIComponent(song_name));
 }
 
+/*
+# Decide if light theme is wanted. If so, build one :)
 window.onload = function () {
   const toggle = document.getElementById("topnav_right_mode_toggle");
   const theme = document.getElementById("stylesheet_toggle");
@@ -44,6 +47,7 @@ window.onload = function () {
     localStorage.setItem("css", theme.href);
   });
 }
+*/
 
 var url = window.location.href.split("/"); //replace string with location.href
 var navLinks = document.getElementsByTagName("nav")[0].getElementsByTagName("a");
