@@ -82,7 +82,6 @@
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar p-0 fixed-top d-flex flex-row">
           <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-            <!--<p class="navbar-brand brand-logo-mini" onclick="window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /></p>-->
             <span class="mdi mdi-spotify" onclick="window.location.replace('/');"></span>
           </div>
           <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
@@ -98,6 +97,9 @@
                 <button type="submit" class="btn btn-success">Search</button>
                 </div>
                 </form>
+                <div style="height:5px;" class="progress">
+                  <div id="progress" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
               </li>
               <li>
                 <p id="current" class="mid green2" onclick="location.href='/current'">{{ current | safe }}</p>
@@ -112,9 +114,6 @@
         </nav>
         <!-- partial -->
         <div class="main-panel">
-          <div style="height:5px;" class="progress">
-            <div id="progress" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
           <!-- partial -->
           <div class="content-wrapper">
             {{ style_start | safe }}

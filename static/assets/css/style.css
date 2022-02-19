@@ -7787,7 +7787,7 @@ hr {
   margin-top: 1rem;
   margin-bottom: 1rem;
   border: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.1); }
+  border-top: 1px solid rgba(116, 116, 116, 0.4); }
 
 small,
 .small {
@@ -21328,4 +21328,10 @@ a:active {
 .responsive {
   max-width: 100%;
   height: auto;
+}
+
+@media screen and (max-width: 555px) {
+  div > div {
+      display: inline-block;
+  }
 }

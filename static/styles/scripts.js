@@ -1,4 +1,5 @@
 function addSong(element_id, id, access_token, song_name) {
+  console.log(song_name);
   var button = document.getElementById(element_id);
   button.disabled = true;
   var Http = new XMLHttpRequest();
@@ -9,13 +10,14 @@ function addSong(element_id, id, access_token, song_name) {
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
   Http.send();
   // show notification
-  $.notify(song_name + " added to queue", {globalPosition: 'bottom center', className:"success"});
+  $.notify(decodeURI(song_name) + " added to queue", {globalPosition: 'bottom center', className:"success"});
   // Update next_songs list
   Http = new XMLHttpRequest();
   url=location.protocol + '//' + document.domain + ':' + location.port + '/addNextSong';
   Http.open("POST", url);
   Http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  //console.log(song_name)
+  console.log(song_name);
+  console.log('name='+encodeURIComponent(song_name));
   Http.send('name='+encodeURIComponent(song_name));
 }
 
