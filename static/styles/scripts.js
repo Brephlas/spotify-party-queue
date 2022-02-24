@@ -79,6 +79,7 @@ if(SOCKET == true) {
   socket.on( 'updatesong_response', function( msg ) {
     $('#current').text(msg)
     $('#current_mainpage').text(msg)
+    document.title = "Spotifyqueue - "+msg;
   })
 
   const interval_progress = setInterval(function() {

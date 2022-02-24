@@ -263,9 +263,11 @@ def playlisthandler():
         html += '<hr>'
         counter = 0
         for track in tracks:
+            html += '<div>'
             html += '<img width="40" height="40" src="'+track[3]+'"/>'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+urllib.parse.quote_plus(track[0])+' - '+urllib.parse.quote_plus(track[1])+'\')">Add to queue</button>'
+            html += '</div>'
             html += '<hr>'
             counter = counter + 1
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
