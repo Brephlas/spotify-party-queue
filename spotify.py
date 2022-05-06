@@ -9,6 +9,7 @@ import urllib
 import configparser
 import redis
 import urllib.parse
+from copy import copy
 
 app = Flask(__name__)
 app.config.from_pyfile('spotify.cfg', silent=True)
@@ -178,7 +179,7 @@ def tracks():
             html += '<div>'
             html += '<img width="40" height="40" src="'+track[3]+'"/>'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            artist_track = urllib.parse.quote_plus(track[0]+' - '+track[1])
+            artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\')">Add to queue</button>'
             html += '</div>'
             html += '<hr>'
@@ -193,7 +194,9 @@ def playlists():
     prev_url = '/playlists'
     try:
         html = ''
-        playlists = spotifyapi.getPlaylists()
+        # create copy of playlists to avoid reversing the returned global playlists
+        playlists = copy(spotifyapi.getPlaylists())
+        playlists.reverse()
         html += '<div class="row">'
         for playlist in playlists:
             cover_path = coverImage(playlist[0])
@@ -258,6 +261,7 @@ def playlisthandler():
     html = ''
     try:
         tracks = spotifyapi.getPlaylistTracks(playlist_id)
+        tracks.reverse()
         html += '<p style="overflow-wrap: break-word; display:inline;"><h4>'+str(name)+'</h4></p>'
         html += '<p>Number of tracks in this playlist: '+str(len(tracks))+'</p>'
         html += '<hr>'

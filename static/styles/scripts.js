@@ -1,5 +1,19 @@
 function addSong(element_id, id, access_token, song_name) {
   console.log(song_name);
+  console.log(decodeURI(song_name));
+  console.log(decodeURIComponent(song_name));
+  // check if there is an active playback
+  if (
+    (
+      document.documentElement.textContent || document.documentElement.innerText
+    ).indexOf('Nothing playing right now') > -1
+  ) {
+    $.notify("There is no playback currently", {globalPosition: 'bottom center', className:"info"});
+    console.log("There is no playback currently");
+    return;
+  }
+
+  // add song to queue
   var button = document.getElementById(element_id);
   button.disabled = true;
   var Http = new XMLHttpRequest();
@@ -10,50 +24,18 @@ function addSong(element_id, id, access_token, song_name) {
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
   Http.send();
   // show notification
-  $.notify(decodeURI(song_name) + " added to queue", {globalPosition: 'bottom center', className:"success"});
+  $.notify("Song added to queue", {globalPosition: 'bottom center', className:"success"});
   // Update next_songs list
   Http = new XMLHttpRequest();
   url=location.protocol + '//' + document.domain + ':' + location.port + '/addNextSong';
   Http.open("POST", url);
   Http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  console.log(song_name);
-  console.log('name='+encodeURIComponent(song_name));
   Http.send('name='+encodeURIComponent(song_name));
 }
 
-/*
-# Decide if light theme is wanted. If so, build one :)
-window.onload = function () {
-  const toggle = document.getElementById("topnav_right_mode_toggle");
-  const theme = document.getElementById("stylesheet_toggle");
-  const selected = localStorage.getItem("css");
-  theme.href = selected;
-  var d = new Date();
-
-  if (localStorage.getItem("css") == null) {
-    // change theme based on time
-    if (d.getHours() >= 16 || d.getHours() < 8) {
-      theme.href = "/static/styles/styles.css";
-    } else {
-      theme.href = "/static/styles/styles_light.css";
-    }
-    localStorage.setItem("css", theme.href);
-  }
-
-  toggle.addEventListener("click", function () {
-    if (theme.getAttribute("href") == "/static/styles/styles_light.css") {
-        theme.href = "/static/styles/styles.css";
-    } else {
-        theme.href = "/static/styles/styles_light.css";
-    }
-    localStorage.setItem("css", theme.href);
-  });
-}
-*/
-
 var url = window.location.href.split("/"); //replace string with location.href
 var navLinks = document.getElementsByTagName("nav")[0].getElementsByTagName("a");
-//naturally you could use something other than the <nav> element
+// you also could use something other than the <nav> element
 var i=0;
 var currentPage = url[url.length - 1]
 for(i;i<navLinks.length;i++){
@@ -62,6 +44,28 @@ for(i;i<navLinks.length;i++){
     navLinks[i].classList.add("current");
 
   }
+}
+
+
+// get/set state of the sidebar
+function toggleSidebar() {
+  try {
+    var state = localStorage.getItem('sidebar');
+    if (state == "closed") {
+      localStorage.setItem('sidebar', 'open');
+    } else {
+      localStorage.setItem('sidebar', 'closed');
+    }
+  } catch {
+    localStorage.setItem('sidebar', 'open');
+  }
+}
+
+// set the sidebar on page load
+if (localStorage.getItem('sidebar') == "closed") {
+  document.body.classList.add("sidebar-icon-only");
+} else {
+  document.body.classList.remove("sidebar-icon-only");
 }
 
 if(SOCKET == true) {

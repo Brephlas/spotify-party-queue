@@ -247,7 +247,10 @@ class spotifyapi:
                     artist = track['track']['artists'][0]['name']
                     song = track['track']['name']
                     uri = track['track']['uri']
-                    cover_url = track['track']['album']['images'][0]['url']
+                    try:
+                        cover_url = track['track']['album']['images'][0]['url']
+                    except IndexError:
+                        cover_url = 'covers/404.jpg'
                     self.playlist_tracks[playlist_id].append((artist, song, uri, cover_url))
                 if not data['items']:
                     # break out of loop as all songs are collected

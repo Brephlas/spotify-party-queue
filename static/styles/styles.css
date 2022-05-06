@@ -3022,6 +3022,7 @@ input[type=button].btn-block {
 
 .collapse:not(.show) {
   display: none;
+  min-height:60px;
 }
 
 .collapsing {
