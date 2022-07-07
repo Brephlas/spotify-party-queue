@@ -2013,7 +2013,7 @@ pre code {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #495057;
+  color: rgb(167, 172, 177);
   background-color: #fff;
   background-clip: padding-box;
   border: 0.125rem solid #ced4da;
@@ -2034,7 +2034,7 @@ pre code {
   text-shadow: 0 0 0 #495057;
 }
 .form-control:focus {
-  color: #495057;
+  color: rgb(167, 172, 177);
   background-color: #fff;
   border-color: #1DB954;
   outline: 0;
@@ -2075,7 +2075,7 @@ input[type=month].form-control {
 }
 
 select.form-control:focus::-ms-value {
-  color: #495057;
+  color: rgb(167, 172, 177);
   background-color: #fff;
 }
 
@@ -2311,7 +2311,7 @@ textarea.form-control {
   margin-top: 0.1rem;
   font-size: 0.875rem;
   line-height: 1.5;
-  color: #fff;
+  color: rgb(126, 126, 126);
   background-color: rgba(220, 53, 69, 0.9);
   border-radius: 0.5rem;
 }

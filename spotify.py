@@ -127,41 +127,6 @@ def search():
     finally:
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
 
-@app.route('/current')
-def template():
-    try:
-        html = '<h5>'
-        html += '<div style="display: inline-block; width: 100%; opacity: 0.4;">'
-        html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">Previously</p>'
-
-        html += '<p class="right" style="overflow-wrap: break-word; display:inline; padding-right: 10px;">'
-        for song in spotifyapi.played_previously[-6:-1]:
-            html += urllib.parse.unquote_plus(song)+'<br>'
-        if len(spotifyapi.played_previously[-6:-1]) == 0:
-            html += 'Restarted shortly. Will display previous songs after the next one finished'
-        html += '</p>'
-        html += '</div>'
-        html += '<br>'
-        html += '<div style="display: inline-block; width: 100%;">'
-        html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">Currently Playing</p>'
-        html += '<div class="right center"><p id="current_mainpage">'+spotifyapi.getCurrentlyPlaying()+'</p></div>'
-        html += '</div>'
-        html += '<br>'
-        html += '<div style="display: inline-block; width: 100%; opacity: 0.4;">'
-        html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">Next up</p>'
-        html += '<p class="right" style="overflow-wrap: break-word; display:inline; padding-right: 10px;">'
-        for song in spotifyapi.play_next:
-            html += urllib.parse.unquote_plus(song)+'<br>'
-        if len(spotifyapi.play_next) == 0:
-            html += 'No songs in queue currently'
-        html += '</p>'
-        html += '</div>'
-        html += '<br>'
-        html += '</h5>'
-        return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
-    except noauthException:
-        return redirect(url_for('auth'))
-
 @app.route('/tracks')
 def tracks():
     global prev_url
@@ -200,7 +165,7 @@ def playlists():
         html += '<div class="row">'
         for playlist in playlists:
             cover_path = coverImage(playlist[0])
-            html += '<div class="col-sm-4 grid-margin">'
+            html += '<div class="col-sm-2 grid-margin">'
             html += '<div class="card">'
             html += '<div class="card-body">'
             html += '<p>'+playlist[1]+'</p>'

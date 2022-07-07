@@ -18,7 +18,6 @@ class spotifyapi:
         self.playlists = []
         self.tracks = [] # helper for storing saved tracks
         self.playlist_tracks = {} # helper for storing tracks of playlists
-        self.played_previously = []
         self.play_next = []
         self.currently_playing = ''
 
@@ -269,16 +268,7 @@ class spotifyapi:
             artist = data['item']['artists'][0]['name']
             song = data['item']['name']
             current_song = artist + ' - ' + song
-            ## add song to local variable as well as previous list,
-            # since this means the song has changed
-            if self.currently_playing != current_song:
-                self.currently_playing = current_song
-                if current_song not in self.played_previously:
-                    self.played_previously.append(current_song)
-                # also remove song from next-up list
-                if current_song in self.play_next:
-                    self.play_next.remove(current_song)
-            return artist + ' - ' + song
+            return current_song
         except:
             return 'Nothing playing right now'
 
