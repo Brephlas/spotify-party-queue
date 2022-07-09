@@ -1,14 +1,13 @@
 # spotify-party-queue
-I was tired of saying "please make sure to not click on a song" when i was giving away my phone so someone else could add his favorite songs to the playback queue and then still fucking up the playback, so i decided to write a web interface (e.g. for the use on a tablet) for spotify that only allows adding songs to the queue.
+I was tired of saying "please make sure to not click on a song" when i was giving away my phone so someone else could add his favorite songs to the playback queue and then still fucking up the playback, so i decided to write a web interface (e.g. for the use on a tablet) for spotify that only allows **adding** songs to the playback queue.
 
 # Features
 - Add songs to queue (only works if spotify is actively playing)
 - List saved songs
 - List playlists (own + followed ones)
      - And all songs of a specific playlist
-- Transfer playback to another device
-- Keyboard for search bar (used [simple-keyboard](https://hodgef.com/simple-keyboard/))
-- Ability to (un)hide specific playlists permanently
+- Transfer playback to another active device
+- Ability to (un)hide specific playlists permanently (/hideplaylists)
 
 # Prerequisites
 - Python3 
@@ -30,14 +29,13 @@ client_secret = CLIENT_SECRET
 redirect_uri = REDIRECT_URI
 port = PORT
 ```
-4. Run `python3 spotify.py`
-5. Open `http://<SERVERIP>:<PORT>` in your browser
-6. Authorize the app to access your spotify data
+4. Change the port to your preferred one in the file `.flaskenv`. I'm using port 5000
+5. Run app with `flask run` or gunicorn `gunicorn --bind=0.0.0.0:<PORT> spotify:app` (`pip install gunicorn`)
+6. Open `http://<SERVERIP>:<PORT>` in your browser
+7. Authorize the app to access your spotify data
+8. Enjoy - Hopefully!
 
 # Screenshots
-
-## Search keyboard
-![](img/search_keyboard.PNG)
 
 ## Search
 ![](img/spotifyqueue.PNG)
