@@ -116,7 +116,7 @@ def search():
         result = spotifyapi.search(q, t)
         counter = 0
         for track in result:
-            html += '<img width="40" height="40" src="'+track[3]+'"/>'
+            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')">Add to queue</button>'
             html += '<hr>'
@@ -142,7 +142,7 @@ def tracks():
         html += '<hr>'
         for track in tracks:
             html += '<div>'
-            html += '<img width="40" height="40" src="'+track[3]+'"/>'
+            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\')">Add to queue</button>'
@@ -233,7 +233,7 @@ def playlisthandler():
         counter = 0
         for track in tracks:
             html += '<div>'
-            html += '<img width="40" height="40" src="'+track[3]+'"/>'
+            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+urllib.parse.quote_plus(track[0])+' - '+urllib.parse.quote_plus(track[1])+'\')">Add to queue</button>'
             html += '</div>'

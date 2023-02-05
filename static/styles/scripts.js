@@ -16,6 +16,7 @@ function addSong(element_id, id, access_token, song_name) {
   // add song to queue
   var button = document.getElementById(element_id);
   button.disabled = true;
+  button.textContent = "Added!";
   var Http = new XMLHttpRequest();
   var url='https://api.spotify.com/v1/me/player/queue?uri='+id;
   Http.open("POST", url);
