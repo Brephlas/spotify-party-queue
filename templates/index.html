@@ -95,7 +95,7 @@
                 <div class="input-group">
                 <input id="songname" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name="q">
                 <input type="hidden" name="type" value="track"/>
-                <button type="submit" class="btn btn-success">Search</button>
+                <button id="search-1" type="submit" class="btn btn-success">Search</button>
                 </div>
                 </form>
                 <div style="height:5px;" class="progress">
@@ -152,6 +152,8 @@
     <!-- Custom js for this page -->
     <script src="{{ url_for('static',filename='assets/js/dashboard.js') }}"></script>
     <script src="{{ url_for('static',filename='styles/scripts.js') }}"></script>
+    <script src="{{ url_for('static',filename='styles/keyevents.js') }}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="{{ url_for('static',filename='styles/notify.js') }}"></script>
     <!-- End custom js for this page -->
   </body>

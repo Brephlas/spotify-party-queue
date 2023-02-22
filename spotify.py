@@ -116,9 +116,10 @@ def search():
         result = spotifyapi.search(q, t)
         counter = 0
         for track in result:
-            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')" />'
+            artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
+            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')">Add to queue</button>'
+            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\')">Add to queue</button>'
             html += '<hr>'
             counter = counter + 1
         html += '<div>'
@@ -140,15 +141,15 @@ def tracks():
         tracks = spotifyapi.getSavedTracks()
         html += '<h3 class="green card-title">Here are your '+str(len(tracks))+' saved tracks</h3>'
         html += '<hr>'
+        html += '<div class="col-lg-13 mx-auto">'
         for track in tracks:
-            html += '<div>'
-            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')" />'
-            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
+            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\')" />'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\')">Add to queue</button>'
-            html += '</div>'
             html += '<hr>'
             counter = counter + 1
+        html += '</div>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))
@@ -230,15 +231,16 @@ def playlisthandler():
         html += '<p style="overflow-wrap: break-word; display:inline;"><h4>'+str(name)+'</h4></p>'
         html += '<p>Number of tracks in this playlist: '+str(len(tracks))+'</p>'
         html += '<hr>'
+        html += '<div class="col-lg-13 mx-auto">'
         counter = 0
         for track in tracks:
-            html += '<div>'
-            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+track[0]+' - '+track[1]+'\')" />'
+            artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
+            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+urllib.parse.quote_plus(track[0])+' - '+urllib.parse.quote_plus(track[1])+'\')">Add to queue</button>'
-            html += '</div>'
+            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\')">Add to queue</button>'
             html += '<hr>'
             counter = counter + 1
+        html += '</div>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))
