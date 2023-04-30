@@ -1,15 +1,11 @@
-function addSong(element_id, id, access_token, song_name) {
-  console.log(song_name);
-  console.log(decodeURI(song_name));
-  console.log(decodeURIComponent(song_name));
+function addSong(element_id, id, access_token, song_name, img_path) {
   // check if there is an active playback
   if (
     (
       document.documentElement.textContent || document.documentElement.innerText
     ).indexOf('Nothing playing right now') > -1
   ) {
-    $.notify("There is no playback currently", {globalPosition: 'bottom center', className:"info"});
-    console.log("There is no playback currently");
+    iziToast.warning({title: 'There is no playback currently',position: 'topCenter'});
     return;
   }
 
@@ -25,7 +21,22 @@ function addSong(element_id, id, access_token, song_name) {
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
   Http.send();
   // show notification
-  $.notify("Song added to queue", {globalPosition: 'bottom center', className:"success"});
+  iziToast.show({
+        theme: 'dark',
+        icon: 'icon-contacts',
+        title: decodeURI(song_name.replaceAll('+', ' ')),
+	message: ' added to queue',
+        displayMode: 2,
+        position: 'topCenter',
+        transitionIn: 'flipInX',
+        transitionOut: 'flipOutX',
+	image: img_path,
+        progressBarColor: 'rgb(0, 255, 184)',
+        imageWidth: 70,
+        layout: 2,
+        iconColor: 'rgb(0, 255, 184)'
+    });
+
   // Update next_songs list
   Http = new XMLHttpRequest();
   url=location.protocol + '//' + document.domain + ':' + location.port + '/addNextSong';
@@ -46,7 +57,6 @@ for(i;i<navLinks.length;i++){
 
   }
 }
-
 
 // get/set state of the sidebar
 function toggleSidebar() {

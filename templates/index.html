@@ -23,6 +23,9 @@
     <link rel="shortcut icon" href="{{ url_for('static',filename='assets/img/favicon.svg') }}" />
     <script src="{{ url_for('static',filename='styles/socket.io.js') }}"></script>
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>-->
+    <!-- iziToast -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/iziToast.min.css') }}">
+    <script src="{{ url_for('static',filename='styles/iziToast.min.js') }}"></script>
   </head>
   <body class="sidebar-icon-only">
     {% if config["SOCKET"] == True %}
