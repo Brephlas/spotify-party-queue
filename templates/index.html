@@ -86,7 +86,7 @@
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar p-0 fixed-top d-flex flex-row">
           <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-            <span class="mdi mdi-spotify" onclick="window.location.replace('/');"></span>
+            <img style="height:1em;" src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" onclick="window.location.replace('/');" />
           </div>
           <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
             <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
@@ -101,11 +101,14 @@
                 <button id="search-1" type="submit" class="btn btn-success">Search</button>
                 </div>
                 </form>
-                <div style="height:5px;" class="progress">
-                  <div id="progress" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                <div style="height: 5px;" class="progress d-none d-sm-block">
+                  <div id="progress" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
+                </div>
+                <div style="height: 1em;" class="progress d-block d-sm-none">
+			<div id="progress-mobile" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="height: 1em; color: black;">{{ current | safe }}</div>
                 </div>
               </li>
-              <li>
+              <li class="mt-2 mt-md-0 d-none d-sm-flex">
                 <p id="current" class="mid green2">{{ current | safe }}</p>
               </li>
             </ul>

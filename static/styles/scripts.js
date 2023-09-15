@@ -79,6 +79,12 @@ if (localStorage.getItem('sidebar') == "closed") {
   document.body.classList.remove("sidebar-icon-only");
 }
 
+async function reloadImg(url) {
+  await fetch(url, { cache: 'reload', mode: 'no-cors' })
+  document.body.querySelectorAll('img[alt="logo"]')
+    .forEach(img => img.src = url)
+}
+
 if(SOCKET == true) {
   // Update current played song
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
@@ -92,6 +98,19 @@ if(SOCKET == true) {
     socket.emit( 'updatesong', {} )
   } )
   socket.on( 'updatesong_response', function( msg ) {
+
+    // update icon as indicator for playback
+    var icon = document.querySelector('img[alt="logo"]');
+    if(msg == 'Nothing playing right now') {
+	    // white icon because no playback
+	    icon.src = '/static/assets/img/menuicon.png';
+    } else {
+	    // green icon because music is playing
+	    icon.src = '/static/assets/img/menuicon_green.png';
+    }
+    // update cache
+    reloadImg(icon.src);
+
     $('#current').text(msg)
     $('#current_mainpage').text(msg)
     document.title = "Spotifyqueue - "+msg;
@@ -106,5 +125,6 @@ if(SOCKET == true) {
   } )
   socket.on( 'updateprogress_response', function( msg ) {
     $('#progress').attr('aria-valuenow', msg).css('width', msg+'%');
+    $('#progress-mobile').attr('aria-valuenow', msg).css('width', msg+'%');
   })
 }

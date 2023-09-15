@@ -267,7 +267,10 @@ class spotifyapi:
             data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
             artist = data['item']['artists'][0]['name']
             song = data['item']['name']
-            current_song = artist + ' - ' + song
+            if len(artist + ' - ' + song) < 30:
+                current_song = artist + ' - ' + song
+            else:
+                current_song = song
             return current_song
         except:
             return 'Nothing playing right now'
@@ -285,7 +288,7 @@ class spotifyapi:
             track_length = data_track['duration_ms']
             return str(100*float(progress)/float(track_length))
         except:
-            return 'Nothing playing right now'
+            return '0'
 
     def getAvailableDevices(self):
         try:
