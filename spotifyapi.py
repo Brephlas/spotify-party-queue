@@ -101,28 +101,48 @@ class spotifyapi:
             raise noauthException
 
     def getSavedTracks(self):
-        if self.tracks:
-            data = self.sendRequest('https://api.spotify.com/v1/me/tracks?limit=1')
-            for track in data['items']:
-                uri = track['track']['uri']
-            if uri == self.tracks[0][2]:
-                # if the first local stored song matches with the api's first stored song
-                # there was no change made and we can use the local list
-                return self.tracks
+        counter = 0
         try:
+            if self.tracks:
+                data = self.sendRequest('https://api.spotify.com/v1/me/tracks?limit=1')
+                for track in data['items']:
+                    uri = track['track']['uri']
+                if uri == self.tracks[0][2]:
+                    # if the first local stored song matches with the api's first stored song
+                    # there was no change made and we can use the local list
+                    return self.tracks
+                else:
+                    tmp_list = []
+                    for i in range(5):
+                        offset = i * 5
+                        data = self.sendRequest('https://api.spotify.com/v1/me/tracks?limit=5&offset='+str(offset))
+                        for track in data['items']:
+                            uri = track['track']['uri']
+                            if uri == self.tracks[0][2]:
+                                tmp_to_extend = self.tracks
+                                tmp_list.extend(tmp_to_extend)
+                                self.tracks = tmp_list
+                                return self.tracks
+                            else:
+                                artist = track['track']['artists'][0]['name']
+                                song = track['track']['name']
+                                uri = track['track']['uri']
+                                cover_url = track['track']['album']['images'][0]['url']
+                                tmp_list.append((artist, song, uri, cover_url))
+
+            # no tracks are stored
             self.tracks = []
-            counter = 0
             # while there are saved songs left to collect
             while True:
                 offset = counter * 50
                 data = self.sendRequest('https://api.spotify.com/v1/me/tracks?limit=50&offset='+str(offset))
-                
+            
                 # check if auth token is missing
-                try:
-                    if data['error']['message']:
-                        raise noauthException
-                except KeyError:
-                    pass
+                #try:
+                #    if data['error']['message']:
+                #        raise noauthException
+                #except KeyError:
+                #    pass
 
                 for track in data['items']:
                     artist = track['track']['artists'][0]['name']
@@ -135,7 +155,7 @@ class spotifyapi:
                     break
                 counter = counter + 1
             return self.tracks
-        except noauthException:
+        except KeyError:
             raise noauthException
 
     def getPlaylists(self):
