@@ -18,12 +18,12 @@ function eKeyUp(e){
     e.preventDefault();
     var counter = 0;
     var selected_exists = false;
-    $('.col-lg-13.mx-auto').children('p').each(function(i) {
+    $('.col-lg-13.mx-auto').children('div').children('p').each(function(i) {
         counter = counter + 1;
         if(~$(this).text().indexOf(">")) { selected_exists = true; return false; }
     });
     var counter2 = 1;
-    $('.col-lg-13.mx-auto').children('p').each(function(i) {
+    $('.col-lg-13.mx-auto').children('div').children('p').each(function(i) {
         if(!selected_exists) {
            $(this).text('> '+$(this).text());
            return false;
@@ -41,12 +41,12 @@ function eKeyUp(e){
     e.preventDefault();
     var counter = 0;
     var selected_exists = false;
-    $('.col-lg-13.mx-auto').children('p').each(function(i) {
+    $('.col-lg-13.mx-auto').children('div').children('p').each(function(i) {
         counter = counter + 1;
         if(~$(this).text().indexOf(">")) { selected_exists = true; return false; }
     });
     var counter2 = 1;
-    $('.col-lg-13.mx-auto').children('p').each(function(i) {
+    $('.col-lg-13.mx-auto').children('div').children('p').each(function(i) {
         if(!selected_exists) {
            $(this).text('> '+$(this).text());
            return false;
@@ -61,7 +61,6 @@ function eKeyUp(e){
     });
   } else if(e.which == 17) {
     if(~window.location.href.indexOf("playlists")) {
-            console.log("try to click playlist");
             // use ctrl to click a playlist in case playlists are listed
             var selected_exists = false;
             $('.row').children('div').each(function(i) {
@@ -75,10 +74,9 @@ function eKeyUp(e){
     } else {
             // ctrl click (add current element to queue)
             var selected_exists = false;
-            $('.col-lg-13.mx-auto').children('p').each(function(i) {
+            $('.col-lg-13.mx-auto').children('div').children('p').each(function(i) {
                 if(~$(this).text().indexOf(">")) {
                         if(!$(this).next().is(":disabled")) {
-                                console.log("Add to queue: "+$(this));
                                 selected_exists = true;
                                 // click "Add to queue" button
                                 $(this).next().click();
@@ -93,7 +91,6 @@ function eKeyUp(e){
         console.log("Nothing selected");
     }
   } else if(e.which == 37) {
-          console.log("left click");
           // arrow down
           var counter = 0;
           var selected_exists = false;
@@ -115,7 +112,6 @@ function eKeyUp(e){
                 counter2 = counter2 + 1;
           });
   } else if(e.which == 39) {
-          console.log("right click");
           // arrow down
           var counter = 0;
           var selected_exists = false;
