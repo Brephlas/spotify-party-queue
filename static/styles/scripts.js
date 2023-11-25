@@ -25,7 +25,7 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   if(window.screen.width <= 980) {
 	  timeout_target = 1500;
   } else {
-	  timeout_target = 5000;
+	  timeout_target = 3000;
   }
 
   // show notification
@@ -140,3 +140,23 @@ if(SOCKET == true) {
     $('#progress-mobile').attr('aria-valuenow', msg).css('width', msg+'%');
   })
 }
+
+// progress bar click listener
+document.getElementById('progress').addEventListener('click', function (e) {
+    var maxWidth = document.getElementById("progress-container").offsetWidth;
+    var currentProgress = e.offsetX;
+    var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
+
+    console.log( percentageProgress );
+    socket.emit('changeProgress', {'progress': percentageProgress})
+});
+
+// progress bar click listener (mobile)
+document.getElementById('progress-mobile').addEventListener('click', function (e) {
+    var maxWidth = document.getElementById("progress-mobile-container").offsetWidth;
+    var currentProgress = e.offsetX;
+    var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
+
+    console.log( percentageProgress );
+    socket.emit('changeProgress', {'progress': percentageProgress})
+});

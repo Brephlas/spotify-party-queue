@@ -79,6 +79,12 @@ def handle_update_progress(methods=['GET', 'POST']):
     current_progress = spotifyapi.getCurrentProgress()
     socketio.emit('updateprogress_response', current_progress)
 
+@socketio.on('changeProgress')
+def seekSongPosition(json):
+    song_position = json['progress']
+    if song_position and song_position > 0 and song_position < 100:
+        spotifyapi.seekSongPosition(json['progress'])
+
 @app.route('/addNextSong', methods=['POST'])
 def addNextSong():
     name = request.form.get('name')

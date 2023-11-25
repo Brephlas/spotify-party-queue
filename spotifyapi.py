@@ -137,13 +137,6 @@ class spotifyapi:
                 offset = counter * 50
                 data = self.sendRequest('https://api.spotify.com/v1/me/tracks?limit=50&offset='+str(offset))
             
-                # check if auth token is missing
-                #try:
-                #    if data['error']['message']:
-                #        raise noauthException
-                #except KeyError:
-                #    pass
-
                 for track in data['items']:
                     artist = track['track']['artists'][0]['name']
                     song = track['track']['name']
@@ -299,6 +292,17 @@ class spotifyapi:
         if name not in self.play_next:
             self.play_next.append(name)
 
+    def getTrackLength(self):
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
+            progress = data['progress_ms']
+            song_id = data['item']['id']
+            data_track = self.sendRequest('https://api.spotify.com/v1/tracks/'+str(song_id))
+            track_length = data_track['duration_ms']
+            return track_length
+        except:
+            return '0'
+
     def getCurrentProgress(self):
         try:
             data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
@@ -309,6 +313,14 @@ class spotifyapi:
             return str(100*float(progress)/float(track_length))
         except:
             return '0'
+
+    def seekSongPosition(self, percentage):
+        try:
+            track_length = self.getTrackLength()
+            seekPosition = int(int(track_length) * (percentage/100))
+            requests.put('https://api.spotify.com/v1/me/player/seek?position_ms='+str(seekPosition), headers=self.header)
+        except noauthException:
+            raise noauthException
 
     def getAvailableDevices(self):
         try:
