@@ -20,6 +20,14 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   Http.setRequestHeader('Content-Type', 'application/json');
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
   Http.send();
+
+  // different timeout settings for smaller screens
+  if(window.screen.width <= 980) {
+	  timeout_target = 1500;
+  } else {
+	  timeout_target = 5000;
+  }
+
   // show notification
   iziToast.show({
         theme: 'dark',
@@ -34,15 +42,19 @@ function addSong(element_id, id, access_token, song_name, img_path) {
         progressBarColor: 'rgb(0, 255, 184)',
         imageWidth: 70,
         layout: 2,
-        iconColor: 'rgb(0, 255, 184)'
+        iconColor: 'rgb(0, 255, 184)',
+	timeout: timeout_target
     });
 
   // Update next_songs list
+  // currently not implemented
+  /*
   Http = new XMLHttpRequest();
   url=location.protocol + '//' + document.domain + ':' + location.port + '/addNextSong';
   Http.open("POST", url);
   Http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   Http.send('name='+encodeURIComponent(song_name));
+  */
 }
 
 var url = window.location.href.split("/"); //replace string with location.href
