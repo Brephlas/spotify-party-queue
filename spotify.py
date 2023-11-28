@@ -104,7 +104,7 @@ def search():
     html += '<div class="input-group">'
     html += '<input id="1" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name=\'q\'/>'
     html += '<input type="hidden" name="type" value="track"/>'
-    html += '<button type="submit" class="btn btn-success">Search</button>'
+    html += '<button id="search-2" type="submit" class="btn btn-success">Search</button>'
     html += '</div>'
     html += '</form>'
     html += '<hr id="hr" style="display: none;">'

@@ -98,8 +98,30 @@ async function reloadImg(url) {
 }
 
 if(SOCKET == true) {
-  // Update current played song
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+  // click event handler for the progress bar
+  // progress bar click listener
+  document.getElementById('progress').addEventListener('click', function (e) {
+      var maxWidth = document.getElementById("progress-container").offsetWidth;
+      var currentProgress = e.offsetX;
+      var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
+
+      console.log( percentageProgress );
+      socket.emit('changeProgress', {'progress': percentageProgress})
+  });
+
+  // progress bar click listener (mobile)
+  document.getElementById('progress-mobile').addEventListener('click', function (e) {
+      var maxWidth = document.getElementById("progress-mobile-container").offsetWidth;
+      var currentProgress = e.offsetX;
+      var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
+
+      socket.emit('changeProgress', {'progress': percentageProgress})
+  });
+
+
+  // Update current played song
 
   const interval = setInterval(function() {
     socket.emit( 'updatesong', {} )
@@ -140,23 +162,3 @@ if(SOCKET == true) {
     $('#progress-mobile').attr('aria-valuenow', msg).css('width', msg+'%');
   })
 }
-
-// progress bar click listener
-document.getElementById('progress').addEventListener('click', function (e) {
-    var maxWidth = document.getElementById("progress-container").offsetWidth;
-    var currentProgress = e.offsetX;
-    var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
-
-    console.log( percentageProgress );
-    socket.emit('changeProgress', {'progress': percentageProgress})
-});
-
-// progress bar click listener (mobile)
-document.getElementById('progress-mobile').addEventListener('click', function (e) {
-    var maxWidth = document.getElementById("progress-mobile-container").offsetWidth;
-    var currentProgress = e.offsetX;
-    var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
-
-    console.log( percentageProgress );
-    socket.emit('changeProgress', {'progress': percentageProgress})
-});
