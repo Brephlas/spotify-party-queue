@@ -167,6 +167,9 @@ def tracks():
 @app.route('/playlists')
 def playlists():
     global prev_url
+    # return to previous URL if Tracks are disabled
+    if not app.config.get("TRACKS"):
+        return redirect(prev_url, code=302)
     prev_url = '/playlists'
     try:
         html = ''
@@ -231,6 +234,9 @@ def hideplaylists():
 @app.route('/playlisthandler')
 def playlisthandler():
     global prev_url
+    # return to previous URL if Tracks are disabled
+    if not app.config.get("TRACKS"):
+        return redirect(prev_url, code=302)
     playlist_id = request.args.get('playlist')
     name = request.args.get('name')
     prev_url='/playlisthandler?playlist='+str(playlist_id)
@@ -260,6 +266,10 @@ def playlisthandler():
 @app.route('/playlisthandler_hide', methods=['POST'])
 def playlisthandler_hide():
     global prev_url, playlist_position
+    # return to previous URL if Tracks are disabled
+    if not app.config.get("TRACKS"):
+        return redirect(prev_url, code=302)
+    prev_url = '/hideplaylists'
     playlist_id = request.form.get('playlist_id')
     playlist_name = request.form.get('playlist_name')
     playlist_total_tracks = request.form.get('playlist_total_tracks')
