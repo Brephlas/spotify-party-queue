@@ -31,7 +31,7 @@ style_end = '</div></div></div></div>'
 def coverImage(playlist_id):
     # make sure covers folder exists
     if not os.path.exists('./covers'):
-        os.makedirs('./cover')
+        os.makedirs('./covers')
     # check if playlist_id has a stored cover image
     if not os.path.isfile('covers/'+str(playlist_id)+'.jpg'):
         cover_url = spotifyapi.getCoverImage(playlist_id)
@@ -140,7 +140,7 @@ def search():
 def tracks():
     global prev_url
     # return to previous URL if Tracks are disabled
-    if not app.config.get("TRACKS"):
+    if app.config["TRACKS"] == 'False':
         return redirect(prev_url, code=302)
     prev_url = '/tracks'
     html = '<div class="col-lg-12 mx-auto">'
@@ -168,7 +168,7 @@ def tracks():
 def playlists():
     global prev_url
     # return to previous URL if Tracks are disabled
-    if not app.config.get("TRACKS"):
+    if app.config["TRACKS"] == 'False':
         return redirect(prev_url, code=302)
     prev_url = '/playlists'
     try:
@@ -235,7 +235,7 @@ def hideplaylists():
 def playlisthandler():
     global prev_url
     # return to previous URL if Tracks are disabled
-    if not app.config.get("TRACKS"):
+    if app.config["TRACKS"] == 'False':
         return redirect(prev_url, code=302)
     playlist_id = request.args.get('playlist')
     name = request.args.get('name')
@@ -267,7 +267,7 @@ def playlisthandler():
 def playlisthandler_hide():
     global prev_url, playlist_position
     # return to previous URL if Tracks are disabled
-    if not app.config.get("TRACKS"):
+    if app.config["TRACKS"] == 'False':
         return redirect(prev_url, code=302)
     prev_url = '/hideplaylists'
     playlist_id = request.form.get('playlist_id')
@@ -301,5 +301,37 @@ def playlisthandler_hide():
             for playlist in playlist_hidden:
                 playlist_hidden_write.write("%s\n" % playlist)
         return redirect(prev_url, code=302)
+    except noauthException:
+        return redirect(url_for('auth'))
+
+@app.route('/config', methods=['GET', 'POST'])
+def config():
+    global prev_url
+    try:
+        # handle change request
+        if request.method == 'POST':
+            config_entry = request.form.get('config_entry').upper()
+            reverse = 'True' if app.config.get(str(config_entry)) == 'False' else 'False'
+            app.config[str(config_entry)] = str(reverse)
+
+        # Detect config entries of application
+        trigger_config = False
+        parse_cfgs = []
+        for cfg in app.config:
+            if cfg == 'SOCKET':
+                trigger_config = True
+            if trigger_config == True:
+                parse_cfgs.append(cfg)
+
+        html = ''
+        # create an entry for each relevant config
+        for cfg in parse_cfgs:
+            status = app.config.get(cfg)
+            html += '<h3>'+str(cfg)+'</h3>'
+            html += '<form action="/config" method="POST">'
+            html += '<button type="submit" class="btn">Tracks Toggle - Currently: '+str(status)+'</button>'
+            html += '<input type="hidden" name="config_entry" value="'+cfg+'">'
+            html += '</form>'
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
     except noauthException:
         return redirect(url_for('auth'))
