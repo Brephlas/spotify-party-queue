@@ -183,7 +183,7 @@ def playlists():
             html += '<div class="card">'
             html += '<div class="card-body">'
             html += '<p>'+playlist[1]+'</p>'
-            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'&name='+playlist[1]+'"><img class="responsive" src="'+cover_path+'"/></a>'
+            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'&name='+playlist[1]+'" onclick="loading()"><img class="responsive" src="'+cover_path+'"/></a>'
             html += '</div>'
             html += '</div>'
             html += '</div>'

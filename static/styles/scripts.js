@@ -45,16 +45,18 @@ function addSong(element_id, id, access_token, song_name, img_path) {
         iconColor: 'rgb(0, 255, 184)',
 	timeout: timeout_target
     });
+}
 
-  // Update next_songs list
-  // currently not implemented
-  /*
-  Http = new XMLHttpRequest();
-  url=location.protocol + '//' + document.domain + ':' + location.port + '/addNextSong';
-  Http.open("POST", url);
-  Http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  Http.send('name='+encodeURIComponent(song_name));
-  */
+function loading() {
+	// set mouse cursor to loading
+	document.body.style.cursor='wait';
+	// set icon upper left to loading gif
+	$("#logo_img").hide();
+	$("#logo_img_mini").hide();
+	div_to_display_loading = "logo";
+	document.getElementById(div_to_display_loading).style.backgroundRepeat = 'no-repeat';
+	document.getElementById(div_to_display_loading).style.backgroundSize = 'cover';
+	document.getElementById(div_to_display_loading).style.backgroundImage = 'url(/static/assets/img/loading.gif)';
 }
 
 var url = window.location.href.split("/"); //replace string with location.href
@@ -82,6 +84,7 @@ function toggleSidebar() {
   } catch {
     localStorage.setItem('sidebar', 'open');
   }
+  console.log(table_elements.length);
 }
 
 // set the sidebar on page load

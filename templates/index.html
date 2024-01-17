@@ -41,13 +41,13 @@
     <div class="container-scroller">
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
-        <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-          <p class="sidebar-brand brand-logo" onclick="window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /> Spotifyqueue</p>
-          <p class="sidebar-brand brand-logo-mini" onclick="window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /></p>
+        <div id="logo" class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
+          <p id="logo_img" class="sidebar-brand brand-logo" onclick="window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /> Spotifyqueue</p>
+          <p id="logo_img_mini" class="sidebar-brand brand-logo-mini" onclick="window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /></p>
         </div>
         <ul class="nav">
           <li class="nav-item menu-items">
-            <a class="nav-link" href="/">
+            <a class="nav-link" href="/" onclick="loading()">
               <span class="menu-icon">
                 <i class="mdi mdi-magnify"></i>
               </span>
@@ -56,7 +56,7 @@
           </li>
           {% if config["TRACKS"] == True %}
           <li class="nav-item menu-items">
-            <a class="nav-link" href="/tracks">
+            <a class="nav-link" href="/tracks" onclick="loading()">
               <span class="menu-icon">
                 <i class="mdi mdi-playlist-play"></i>
               </span>
@@ -65,7 +65,7 @@
           </li>
           {% endif %}
           <li class="nav-item menu-items">
-            <a class="nav-link" href="/playlists">
+            <a class="nav-link" href="/playlists" onclick="loading()">
               <span class="menu-icon">
                 <i class="mdi mdi-playlist-music"></i>
               </span>
@@ -115,7 +115,7 @@
         <!-- partial -->
         <div class="main-panel">
           <!-- partial -->
-          <div class="content-wrapper">
+          <div id="content" class="content-wrapper">
             {{ style_start | safe }}
               {{ searchbox | safe }}
                 <!-- Content -->
