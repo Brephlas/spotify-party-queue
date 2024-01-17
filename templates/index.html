@@ -64,6 +64,7 @@
             </a>
           </li>
           {% endif %}
+          {% if config["PLAYLISTS"] == True %}
           <li class="nav-item menu-items">
             <a class="nav-link" href="/playlists" onclick="loading()">
               <span class="menu-icon">
@@ -72,6 +73,7 @@
               <span class="menu-title">Playlists</span>
             </a>
           </li>
+          {% endif %}
         </ul>
       </nav>
       <!-- partial -->

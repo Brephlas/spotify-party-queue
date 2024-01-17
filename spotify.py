@@ -167,8 +167,8 @@ def tracks():
 @app.route('/playlists')
 def playlists():
     global prev_url
-    # return to previous URL if Tracks are disabled
-    if app.config["TRACKS"] == 'False':
+    # return to previous URL if playlists are disabled
+    if app.config["PLAYLISTS"] == 'False':
         return redirect(prev_url, code=302)
     prev_url = '/playlists'
     try:
@@ -195,6 +195,9 @@ def playlists():
 @app.route('/hideplaylists')
 def hideplaylists():
     global prev_url
+    # return to previous URL if playlists are disabled
+    if app.config["PLAYLISTS"] == 'False':
+        return redirect(prev_url, code=302)
     name = request.args.get('name')
     prev_url='/hideplaylists'
     html = '<h4>Hide playlists</h4>'
@@ -234,8 +237,8 @@ def hideplaylists():
 @app.route('/playlisthandler')
 def playlisthandler():
     global prev_url
-    # return to previous URL if Tracks are disabled
-    if app.config["TRACKS"] == 'False':
+    # return to previous URL if playlists are disabled
+    if app.config["PLAYLISTS"] == 'False':
         return redirect(prev_url, code=302)
     playlist_id = request.args.get('playlist')
     name = request.args.get('name')
@@ -266,8 +269,8 @@ def playlisthandler():
 @app.route('/playlisthandler_hide', methods=['POST'])
 def playlisthandler_hide():
     global prev_url, playlist_position
-    # return to previous URL if Tracks are disabled
-    if app.config["TRACKS"] == 'False':
+    # return to previous URL if playlists are disabled
+    if app.config["PLAYLISTS"] == 'False':
         return redirect(prev_url, code=302)
     prev_url = '/hideplaylists'
     playlist_id = request.form.get('playlist_id')
@@ -314,22 +317,24 @@ def config():
             reverse = 'True' if app.config.get(str(config_entry)) == 'False' else 'False'
             app.config[str(config_entry)] = str(reverse)
 
+        num_lines = sum(1 for _ in open('spotify.cfg'))
+
         # Detect config entries of application
         trigger_config = False
         parse_cfgs = []
         for cfg in app.config:
-            if cfg == 'SOCKET':
-                trigger_config = True
-            if trigger_config == True:
                 parse_cfgs.append(cfg)
 
         html = ''
         # create an entry for each relevant config
-        for cfg in parse_cfgs:
+        for cfg in parse_cfgs[-num_lines:]:
             status = app.config.get(cfg)
-            html += '<h3>'+str(cfg)+'</h3>'
+            if status == True:
+                html += '<h3 style="color:#1DB954">'+str(cfg)+'</h3>'
+            else:
+                html += '<h3>'+str(cfg)+'</h3>'
             html += '<form action="/config" method="POST">'
-            html += '<button type="submit" class="btn">Tracks Toggle - Currently: '+str(status)+'</button>'
+            html += '<button type="submit" class="btn btn-info">Toggle - Currently: '+str(status)+'</button>'
             html += '<input type="hidden" name="config_entry" value="'+cfg+'">'
             html += '</form>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
