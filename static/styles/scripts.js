@@ -50,13 +50,40 @@ function addSong(element_id, id, access_token, song_name, img_path) {
 function loading() {
 	// set mouse cursor to loading
 	document.body.style.cursor='wait';
+
+	// larger screen
 	// set icon upper left to loading gif
 	$("#logo_img").hide();
 	$("#logo_img_mini").hide();
 	div_to_display_loading = "logo";
 	document.getElementById(div_to_display_loading).style.backgroundRepeat = 'no-repeat';
 	document.getElementById(div_to_display_loading).style.backgroundSize = 'cover';
-	document.getElementById(div_to_display_loading).style.backgroundImage = 'url(/static/assets/img/loading.gif)';
+	// check if there is an active playback
+	if (
+	  (
+	    document.documentElement.textContent || document.documentElement.innerText
+	  ).indexOf('Nothing playing right now') > -1
+	) {
+	  document.getElementById(div_to_display_loading).style.backgroundImage = 'url(/static/assets/img/loading_white.gif)';
+	} else {
+	  document.getElementById(div_to_display_loading).style.backgroundImage = 'url(/static/assets/img/loading.gif)';
+	}
+
+	// small screens
+	$("#logo-mini").hide();
+	div_to_display_loading = "logo-mini-div";
+	document.getElementById(div_to_display_loading).style.backgroundRepeat = 'no-repeat';
+	document.getElementById(div_to_display_loading).style.backgroundSize = 'cover';
+	// check if there is an active playback
+	if (
+	  (
+	    document.documentElement.textContent || document.documentElement.innerText
+	  ).indexOf('Nothing playing right now') > -1
+	) {
+	  document.getElementById(div_to_display_loading).style.backgroundImage = 'url(/static/assets/img/loading_white.gif)';
+	} else {
+	  document.getElementById(div_to_display_loading).style.backgroundImage = 'url(/static/assets/img/loading.gif)';
+	}
 }
 
 var url = window.location.href.split("/"); //replace string with location.href
