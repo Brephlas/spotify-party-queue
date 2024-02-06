@@ -60,8 +60,26 @@ class spotifyapi:
             except:
                 return None
 
+    def sendRequest_PUT(self, url):
+        r = requests.put(url, headers=self.header)
+        if 'The access token expired' in r.text:
+            # refresh the token automatically if it expired
+            self.refreshToken()
+            r = requests.put(url, headers=self.header)
+            return json.loads(r.text)
+        elif 'Only valid bearer authentication supported' in r.text:
+            # first authentication missing
+            raise noauthException
+        else:
+            # prevent error if there is no song played currently
+            try:
+                return json.loads(r.text)
+            except:
+                return None
+
     def authorize(self):
-        permissions = ['user-modify-playback-state', 'playlist-read-private', 'user-read-playback-state', 'user-library-read']
+        #permissions = ['user-modify-playback-state', 'playlist-read-private', 'user-read-playback-state', 'user-library-read'] # without ability to modify playback
+        permissions = ['user-modify-playback-state', 'playlist-read-private', 'user-read-playback-state', 'user-library-read', 'user-library-modify'] # usage for e.g. save current song
         scope = '%20'.join(permissions)
         return redirect('https://accounts.spotify.com/authorize?client_id='+self.client_id+'&response_type=code&redirect_uri='+self.redirect_uri+':'+self.port+'/token&scope='+scope, code=302)
 
@@ -321,6 +339,41 @@ class spotifyapi:
             requests.put('https://api.spotify.com/v1/me/player/seek?position_ms='+str(seekPosition), headers=self.header)
         except noauthException:
             raise noauthException
+
+    def saveCurrentSong(self):
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
+            song_id = data['item']['id']
+            self.sendRequest_PUT('https://api.spotify.com/v1/me/tracks/?ids='+str(song_id))
+            return True
+        except noauthException:
+            raise noauthException
+        except:
+            return False
+
+    def getRecommendations(self, seed_id):
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/recommendations?limit=20&seed_tracks='+str(seed_id))
+            return data
+        except noauthException:
+            raise noauthException
+
+    def getSongName(self, song_id):
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/tracks/'+str(song_id))
+            song_name = data['name']
+            return song_name
+        except:
+            return ''
+
+    def getSongAndArtistName(self, song_id):
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/tracks/'+str(song_id))
+            song_name = data['name']
+            artist_name = data['artists'][0]['name']
+            return artist_name + " - " + song_name
+        except:
+            return ''
 
     def getAvailableDevices(self):
         try:

@@ -24,10 +24,6 @@ prev_url='/'
 style_start = '<div class="row"><div class="col-12 grid-margin stretch-card"><div class="card"><div class="card-body">'
 style_end = '</div></div></div></div>'
 
-# redis session
-#app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
-#server_session = Session(app)
-
 def coverImage(playlist_id):
     # make sure covers folder exists
     if not os.path.exists('./covers'):
@@ -122,13 +118,18 @@ def search():
         result = spotifyapi.search(q, t)
         counter = 0
         for track in result:
-            html += '<div>'
+            html += '<form action="/recommendations" method="get">'
+            html += '<div style="opacity:.0;" class="fading">'
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
+                html += '<button class="btn btn-info right">Recommendations</button>'
             html += '</div>'
             html += '<hr>'
+            html += '</form>'
             counter = counter + 1
         html += '<div>'
     except noauthException:
@@ -140,7 +141,7 @@ def search():
 def tracks():
     global prev_url
     # return to previous URL if Tracks are disabled
-    if app.config["TRACKS"] == 'False':
+    if app.config["TRACKS"] == False:
         return redirect(prev_url, code=302)
     prev_url = '/tracks'
     html = '<div class="col-lg-12 mx-auto">'
@@ -151,13 +152,18 @@ def tracks():
         html += '<hr>'
         html += '<div class="col-lg-13 mx-auto">'
         for track in tracks:
+            html += '<form action="/recommendations" method="get">'
             html += '<div>'
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
+                html += '<button class="btn btn-info right">Recommendations</button>'
             html += '</div>'
             html += '<hr>'
+            html += '</form>'
             counter = counter + 1
         html += '</div>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
@@ -168,7 +174,7 @@ def tracks():
 def playlists():
     global prev_url
     # return to previous URL if playlists are disabled
-    if app.config["PLAYLISTS"] == 'False':
+    if app.config["PLAYLISTS"] == False:
         return redirect(prev_url, code=302)
     prev_url = '/playlists'
     try:
@@ -196,7 +202,7 @@ def playlists():
 def hideplaylists():
     global prev_url
     # return to previous URL if playlists are disabled
-    if app.config["PLAYLISTS"] == 'False':
+    if app.config["PLAYLISTS"] == False:
         return redirect(prev_url, code=302)
     name = request.args.get('name')
     prev_url='/hideplaylists'
@@ -238,7 +244,7 @@ def hideplaylists():
 def playlisthandler():
     global prev_url
     # return to previous URL if playlists are disabled
-    if app.config["PLAYLISTS"] == 'False':
+    if app.config["PLAYLISTS"] == False:
         return redirect(prev_url, code=302)
     playlist_id = request.args.get('playlist')
     name = request.args.get('name')
@@ -253,13 +259,18 @@ def playlisthandler():
         html += '<div class="col-lg-13 mx-auto">'
         counter = 0
         for track in tracks:
-            html += '<div>'
+            html += '<form action="/recommendations" method="get">'
+            html += '<div style="opacity:.0;" class="fading">'
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
+                html += '<button class="btn btn-info right">Recommendations</button>'
             html += '</div>'
             html += '<hr>'
+            html += '</form>'
             counter = counter + 1
         html += '</div>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
@@ -270,7 +281,7 @@ def playlisthandler():
 def playlisthandler_hide():
     global prev_url, playlist_position
     # return to previous URL if playlists are disabled
-    if app.config["PLAYLISTS"] == 'False':
+    if app.config["PLAYLISTS"] == False:
         return redirect(prev_url, code=302)
     prev_url = '/hideplaylists'
     playlist_id = request.form.get('playlist_id')
@@ -307,6 +318,57 @@ def playlisthandler_hide():
     except noauthException:
         return redirect(url_for('auth'))
 
+@app.route('/save-current', methods=['POST'])
+def save_current():
+    global prev_url
+    # return to previous URL if private mode is disabled
+    if app.config["PRIVATE"] == False:
+        return redirect(prev_url, code=302)
+    try:
+        spotifyapi.saveCurrentSong()
+        return redirect(prev_url, code=302)
+    except noauthException:
+        return redirect(url_for('auth'))
+
+@app.route('/recommendations', methods=['GET'])
+def recommendations():
+    global prev_url
+    if app.config["RECOMMENDATIONS"] == False:
+        return redirect(prev_url, code=302)
+    try:
+        song_id = request.args.get('song_id')
+        song_name = spotifyapi.getSongAndArtistName(song_id)
+        # error handling, redirect back if no song_id provided
+        if not song_id:
+            return redirect(prev_url, code=302)
+        prev_url = '/recommendations?song_id='+str(song_id)
+        songs = spotifyapi.getRecommendations(song_id)
+        track = songs['tracks'][0]
+        html = ''
+        html += '<p style="overflow-wrap: break-word; display:inline;"><h4>Recommendations for '+str(song_name)+'</h4></p>'
+        html += '<hr>'
+        html += '<div class="col-lg-13 mx-auto">'
+        counter = 0
+        for track in songs['tracks']:
+            # track vars
+            track_name = track['name']
+            artist_name = track['artists'][0]['name']
+            track_uri = track['uri']
+            track_img = track['album']['images'][0]['url']
+            artist_track = urllib.parse.quote_plus((artist_name + " - " + track_name).encode('utf-8'))
+            # build HTML
+            html += '<div style="opacity:.0;" class="fading">'
+            html += '<img width="40" height="40" src="'+track_img+'" ondblclick="addSong('+str(counter)+', \''+track_uri+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track_img+'\')" />'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+artist_name+' - '+track_name+'</p>'
+            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track_uri+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track_img+'\')">Add to queue</button>'
+            html += '</div>'
+            html += '<hr>'
+            counter = counter + 1
+        html += '</div>'
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
+    except noauthException:
+        return redirect(url_for('auth'))
+
 @app.route('/config', methods=['GET', 'POST'])
 def config():
     global prev_url
@@ -314,8 +376,8 @@ def config():
         # handle change request
         if request.method == 'POST':
             config_entry = request.form.get('config_entry').upper()
-            reverse = 'True' if app.config.get(str(config_entry)) == 'False' else 'False'
-            app.config[str(config_entry)] = str(reverse)
+            reverse = True if app.config.get(str(config_entry)) == False else False
+            app.config[str(config_entry)] = reverse
 
         num_lines = sum(1 for _ in open('spotify.cfg'))
 

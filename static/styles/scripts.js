@@ -1,5 +1,6 @@
 function addSong(element_id, id, access_token, song_name, img_path) {
   // check if there is an active playback
+  console.log(element_id);
   if (
     (
       document.documentElement.textContent || document.documentElement.innerText
@@ -11,8 +12,6 @@ function addSong(element_id, id, access_token, song_name, img_path) {
 
   // add song to queue
   var button = document.getElementById(element_id);
-  button.disabled = true;
-  button.textContent = "Added!";
   var Http = new XMLHttpRequest();
   var url='https://api.spotify.com/v1/me/player/queue?uri='+id;
   Http.open("POST", url);
@@ -20,6 +19,16 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   Http.setRequestHeader('Content-Type', 'application/json');
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
   Http.send();
+
+  if(REMOVE_ELEMENTS == true) {
+	  button_div_parent = button.parentElement;
+	  button_div_parent_hr = button.parentElement.nextElementSibling;
+	  button_div_parent.remove();
+	  button_div_parent_hr.remove();
+  } else {
+	  button.disabled = true;
+	  button.textContent = "Added!";
+  }
 
   // different timeout settings for smaller screens
   if(window.screen.width <= 980) {
@@ -191,4 +200,28 @@ if(SOCKET == true) {
     $('#progress').attr('aria-valuenow', msg).css('width', msg+'%');
     $('#progress-mobile').attr('aria-valuenow', msg).css('width', msg+'%');
   })
+}
+
+window.onload = function fading() {
+	var elements = document.querySelectorAll('.fading');
+	anime({
+		targets: elements,
+		duration: (el, i) => 10*i + 500,
+//delay: (el, i) => 100+30*i,
+		delay: anime.stagger(30),
+		opacity: [0, 1],
+		easing: 'easeOutExpo',
+		translateX: [40, 0],
+		opacity: 1
+	});
+	var elements = document.querySelectorAll('.fading-slow');
+	anime({
+		targets: elements,
+		duration: (el, i) => 10*i + 500,
+		delay: (el, i) => (100+30*i)/(30+i),
+		opacity: [0, 1],
+		easing: 'easeOutExpo',
+		translateX: [40, 0],
+		opacity: 1
+	});
 }

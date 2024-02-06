@@ -38,6 +38,15 @@
             var SOCKET = false;
         </script>
     {% endif %}
+    {% if config["REMOVE_ELEMENTS"] == True %}
+        <script>
+            var REMOVE_ELEMENTS = true;
+        </script>
+    {% else %}
+        <script>
+            var REMOVE_ELEMENTS = false;
+        </script>
+    {% endif %}
     <div class="container-scroller">
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -65,12 +74,22 @@
           </li>
           {% endif %}
           {% if config["PLAYLISTS"] == True %}
-          <li class="nav-item menu-items">
+          <li class="nav-item menu-items bottom">
             <a class="nav-link" href="/playlists" onclick="loading()">
               <span class="menu-icon">
                 <i class="mdi mdi-playlist-music"></i>
               </span>
               <span class="menu-title">Playlists</span>
+            </a>
+          </li>
+          {% endif %}
+          {% if config["PRIVATE"] == True %}
+          <li class="nav-item menu-items bottom">
+            <a class="nav-link" href="/config" onclick="loading()">
+              <span class="menu-icon">
+                <i class="mdi mdi-cogs"></i>
+              </span>
+              <span class="menu-title">Settings</span>
             </a>
           </li>
           {% endif %}
@@ -90,12 +109,13 @@
             <ul class="navbar-nav w-100">
               <li class="nav-item w-100">
                 <form action="/" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search" method="get">
-                <div class="input-group">
-                <input id="songname" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name="q">
-                <input type="hidden" name="type" value="track"/>
-                <button id="search-1" type="submit" class="btn btn-success">Search</button>
-                </div>
+                  <div class="input-group">
+                    <input id="songname" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name="q">
+                    <input type="hidden" name="type" value="track"/>
+                    <button id="search-1" type="submit" class="btn btn-success">Search</button>
+                  </div>
                 </form>
+
                 <div id="progress-container" style="height: 5px;" class="progress d-none d-sm-block">
                   <div id="progress" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="height: 5px;"></div>
                 </div>
@@ -103,6 +123,16 @@
 			<div id="progress-mobile" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="height: 1em; color: black;">{{ current | safe }}</div>
                 </div>
               </li>
+              
+              {% if config["PRIVATE"] == True %}
+              <!-- Save current song button-->
+              <li class="mt-2 mt-md-0 d-none d-sm-flex">
+                <form action="/save-current" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search" method="post">
+                  <button id="save-song-button" type="submit" class="btn btn-info">Save Song</button>
+                </form>
+              </li>
+              {% endif %}
+
               <li class="mt-2 mt-md-0 d-none d-sm-flex">
                 <p id="current" class="mid green2">{{ current | safe }}</p>
               </li>
@@ -154,8 +184,8 @@
     <script src="{{ url_for('static',filename='assets/js/dashboard.js') }}"></script>
     <script src="{{ url_for('static',filename='styles/scripts.js') }}"></script>
     <script src="{{ url_for('static',filename='styles/keyevents.js') }}"></script>
+    <script src="{{ url_for('static',filename='styles/anime.min.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script src="{{ url_for('static',filename='styles/notify.js') }}"></script>
     <!-- End custom js for this page -->
   </body>
 </html>
