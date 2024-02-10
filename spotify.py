@@ -118,7 +118,9 @@ def search():
         result = spotifyapi.search(q, t)
         counter = 0
         for track in result:
-            html += '<form action="/recommendations" method="get">'
+            html += '<div>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '<form action="/recommendations" method="get">'
             html += '<div style="opacity:.0;" class="fading">'
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
@@ -127,9 +129,11 @@ def search():
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info right">Recommendations</button>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '</form>'
+            html += '</div>'
             html += '</div>'
             html += '<hr>'
-            html += '</form>'
             counter = counter + 1
         html += '<div>'
     except noauthException:
@@ -152,7 +156,9 @@ def tracks():
         html += '<hr>'
         html += '<div class="col-lg-13 mx-auto">'
         for track in tracks:
-            html += '<form action="/recommendations" method="get">'
+            html += '<div>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '<form action="/recommendations" method="get">'
             html += '<div>'
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
@@ -162,8 +168,10 @@ def tracks():
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info right">Recommendations</button>'
             html += '</div>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '</form>'
+            html += '</div>'
             html += '<hr>'
-            html += '</form>'
             counter = counter + 1
         html += '</div>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
@@ -259,7 +267,9 @@ def playlisthandler():
         html += '<div class="col-lg-13 mx-auto">'
         counter = 0
         for track in tracks:
-            html += '<form action="/recommendations" method="get">'
+            html += '<div>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '<form action="/recommendations" method="get">'
             html += '<div style="opacity:.0;" class="fading">'
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
@@ -269,8 +279,10 @@ def playlisthandler():
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info right">Recommendations</button>'
             html += '</div>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '</form>'
+            html += '</div>'
             html += '<hr>'
-            html += '</form>'
             counter = counter + 1
         html += '</div>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
