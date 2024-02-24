@@ -129,13 +129,13 @@ def search():
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info right">Recommendations</button>'
+            html += '<hr>'
+            html += '</div>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '</form>'
             html += '</div>'
-            html += '</div>'
-            html += '<hr>'
             counter = counter + 1
-        html += '<div>'
+        html += '</div>'
     except noauthException:
         return redirect(url_for('auth'))
     finally:
@@ -167,11 +167,11 @@ def tracks():
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info right">Recommendations</button>'
+            html += '<hr>'
             html += '</div>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '</form>'
             html += '</div>'
-            html += '<hr>'
             counter = counter + 1
         html += '</div>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
@@ -278,11 +278,11 @@ def playlisthandler():
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info right">Recommendations</button>'
+            html += '<hr>'
             html += '</div>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '</form>'
             html += '</div>'
-            html += '<hr>'
             counter = counter + 1
         html += '</div>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
