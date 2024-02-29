@@ -1,6 +1,5 @@
 function addSong(element_id, id, access_token, song_name, img_path) {
   // check if there is an active playback
-  console.log(element_id);
   if (
     (
       document.documentElement.textContent || document.documentElement.innerText
@@ -22,9 +21,7 @@ function addSong(element_id, id, access_token, song_name, img_path) {
 
   if(REMOVE_ELEMENTS == true) {
 	  button_div_parent = button.parentElement;
-	  button_div_parent_hr = button.parentElement.nextElementSibling;
 	  button_div_parent.remove();
-	  button_div_parent_hr.remove();
   } else {
 	  button.disabled = true;
 	  button.textContent = "Added!";
@@ -120,7 +117,6 @@ function toggleSidebar() {
   } catch {
     localStorage.setItem('sidebar', 'open');
   }
-  console.log(table_elements.length);
 }
 
 // set the sidebar on page load
