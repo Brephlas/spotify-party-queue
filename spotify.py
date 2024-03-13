@@ -196,8 +196,8 @@ def playlists():
             html += '<div class="col-sm-2 grid-margin">'
             html += '<div class="card">'
             html += '<div class="card-body">'
-            html += '<p>'+playlist[1]+'</p>'
-            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'&name='+playlist[1]+'" onclick="loading()"><img class="responsive" src="'+cover_path+'"/></a>'
+            html += '<p>'+str(playlist[1])+'</p>'
+            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+str(playlist[0])+'" onclick="loading()"><img class="responsive" src="'+cover_path+'"/></a>'
             html += '</div>'
             html += '</div>'
             html += '</div>'
@@ -255,7 +255,7 @@ def playlisthandler():
     if app.config["PLAYLISTS"] == False:
         return redirect(prev_url, code=302)
     playlist_id = request.args.get('playlist')
-    name = request.args.get('name')
+    name = spotifyapi.getPlaylistName(playlist_id)
     prev_url='/playlisthandler?playlist='+str(playlist_id)
     html = ''
     try:

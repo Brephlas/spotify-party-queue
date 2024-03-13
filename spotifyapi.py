@@ -247,6 +247,13 @@ class spotifyapi:
             return data[0]['url']
         else:
             return ''
+        
+    def getPlaylistName(self, playlist_id):
+        data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id)
+        if data:
+            return data['name']
+        else:
+            return ''
 
     def getPlaylistTracks(self, playlist_id):
         if playlist_id in self.playlist_tracks:
