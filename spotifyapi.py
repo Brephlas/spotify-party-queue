@@ -118,7 +118,7 @@ class spotifyapi:
         except (noauthException):
             raise noauthException
 
-    def getSavedTracks(self):
+    def getSavedTracks(self, songs_dynamic_loading = True):
         counter = 0
         try:
             if self.tracks:
@@ -150,21 +150,33 @@ class spotifyapi:
 
             # no tracks are stored
             self.tracks = []
-            # while there are saved songs left to collect
-            while True:
-                offset = counter * 50
-                data = self.sendRequest('https://api.spotify.com/v1/me/tracks?limit=50&offset='+str(offset))
-            
+
+            # determine if dynamic loading is enabled to load all songs at once or not
+            if songs_dynamic_loading:
+                data = self.sendRequest('https://api.spotify.com/v1/me/tracks?limit=50')
+                
                 for track in data['items']:
                     artist = track['track']['artists'][0]['name']
                     song = track['track']['name']
                     uri = track['track']['uri']
                     cover_url = track['track']['album']['images'][0]['url']
                     self.tracks.append((artist, song, uri, cover_url))
-                if not data['items']:
-                    # break out of loop as all songs are collected
-                    break
-                counter = counter + 1
+            else:
+                # while there are saved songs left to collect
+                while True:
+                    offset = counter * 50
+                    data = self.sendRequest('https://api.spotify.com/v1/me/tracks?limit=50&offset='+str(offset))
+                
+                    for track in data['items']:
+                        artist = track['track']['artists'][0]['name']
+                        song = track['track']['name']
+                        uri = track['track']['uri']
+                        cover_url = track['track']['album']['images'][0]['url']
+                        self.tracks.append((artist, song, uri, cover_url))
+                    if not data['items']:
+                        # break out of loop as all songs are collected
+                        break
+                    counter = counter + 1
             return self.tracks
         except KeyError:
             raise noauthException
@@ -255,7 +267,7 @@ class spotifyapi:
         else:
             return ''
 
-    def getPlaylistTracks(self, playlist_id):
+    def getPlaylistTracks(self, playlist_id, playlists_dynamic_loading = False):
         if playlist_id in self.playlist_tracks:
             data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks?limit=1')
             for track in data['items']:
@@ -269,17 +281,18 @@ class spotifyapi:
             self.playlist_tracks[playlist_id] = []
             counter = 0
             # while there are saved songs left to collect
-            while True:
-                offset = counter * 50
-                data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks?limit=50&offset='+str(offset))
-                
-                # check if auth token is missing
-                try:
-                    if data['error']['message']:
-                        raise noauthException
-                except KeyError:
-                    pass
+            offset = counter * 50
+            data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks?limit=50')
+            
+            # check if auth token is missing
+            try:
+                if data['error']['message']:
+                    raise noauthException
+            except KeyError:
+                pass
 
+            # only load first 50 songs if configured
+            if playlists_dynamic_loading == True:
                 for track in data['items']:
                     artist = track['track']['artists'][0]['name']
                     song = track['track']['name']
@@ -289,10 +302,31 @@ class spotifyapi:
                     except IndexError:
                         cover_url = 'covers/404.jpg'
                     self.playlist_tracks[playlist_id].append((artist, song, uri, cover_url))
-                if not data['items']:
-                    # break out of loop as all songs are collected
-                    break
-                counter = counter + 1
+            else:
+                while True:
+                    offset = counter * 50
+                    data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks?limit=50&offset='+str(offset))
+                    
+                    # check if auth token is missing
+                    try:
+                        if data['error']['message']:
+                            raise noauthException
+                    except KeyError:
+                        pass
+
+                    for track in data['items']:
+                        artist = track['track']['artists'][0]['name']
+                        song = track['track']['name']
+                        uri = track['track']['uri']
+                        try:
+                            cover_url = track['track']['album']['images'][0]['url']
+                        except IndexError:
+                            cover_url = 'covers/404.jpg'
+                        self.playlist_tracks[playlist_id].append((artist, song, uri, cover_url))
+                    if not data['items']:
+                        # break out of loop as all songs are collected
+                        break
+                    counter = counter + 1
             return self.playlist_tracks[playlist_id]
         except noauthException:
             raise noauthException

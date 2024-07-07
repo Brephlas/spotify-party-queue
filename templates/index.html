@@ -47,6 +47,27 @@
             var REMOVE_ELEMENTS = false;
         </script>
     {% endif %}
+    {% if config["RECOMMENDATIONS"] == True %}
+        <script>
+            var RECOMMENDATIONS = true;
+        </script>
+    {% else %}
+        <script>
+            var RECOMMENDATIONS = false;
+        </script>
+    {% endif %}
+    {% if config["PLAYLISTS_DYNAMIC_LOADING"] == True %}
+        <script>
+            var PLAYLISTS_DYNAMIC_LOADING = true;
+        </script>
+    {% else %}
+        <script>
+            var PLAYLISTS_DYNAMIC_LOADING = false;
+        </script>
+    {% endif %}
+    <script>
+        var access_token = "{{ access_token | safe }}";
+    </script>
     <div class="container-scroller">
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">

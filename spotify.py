@@ -114,7 +114,7 @@ def search():
     try:
         # error handling
         if q is None or t is None:
-            return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
+            return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
         result = spotifyapi.search(q, t)
         counter = 0
         for track in result:
@@ -139,7 +139,7 @@ def search():
     except noauthException:
         return redirect(url_for('auth'))
     finally:
-        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
 
 @app.route('/tracks')
 def tracks():
@@ -152,7 +152,7 @@ def tracks():
     counter = 0
     try:
         tracks = spotifyapi.getSavedTracks()
-        html += '<h3 class="green card-title">Here are your '+str(len(tracks))+' saved tracks</h3>'
+        html += '<h3 id="songs_no" class="green card-title">Here are your '+str(len(tracks))+' saved tracks</h3>'
         html += '<hr>'
         html += '<div class="col-lg-13 mx-auto">'
         for track in tracks:
@@ -173,8 +173,9 @@ def tracks():
                 html += '</form>'
             html += '</div>'
             counter = counter + 1
+        html += '<div id="more" style="text-align:center">More</div>'
         html += '</div>'
-        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))
 
@@ -197,12 +198,12 @@ def playlists():
             html += '<div class="card">'
             html += '<div class="card-body">'
             html += '<p>'+str(playlist[1])+'</p>'
-            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+str(playlist[0])+'" onclick="loading()"><img class="responsive" src="'+cover_path+'"/></a>'
+            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+str(playlist[0])+'" onclick="loading(\''+spotifyapi.getAccessToken()+'\')"><img class="responsive" src="'+cover_path+'"/></a>'
             html += '</div>'
             html += '</div>'
             html += '</div>'
         html += '</div>'
-        return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))
 
@@ -244,7 +245,7 @@ def hideplaylists():
             html += '<input type="hidden" name="playlist_total_tracks" value="'+str(playlist[2])+'">'
             html += '</form>'
             html += '<hr>'
-        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))
 
@@ -259,10 +260,10 @@ def playlisthandler():
     prev_url='/playlisthandler?playlist='+str(playlist_id)
     html = ''
     try:
-        tracks = spotifyapi.getPlaylistTracks(playlist_id)
+        tracks = spotifyapi.getPlaylistTracks(playlist_id, app.config["PLAYLISTS_DYNAMIC_LOADING"])
         tracks.reverse()
         html += '<p style="overflow-wrap: break-word; display:inline;"><h4>'+str(name)+'</h4></p>'
-        html += '<p>Number of tracks in this playlist: '+str(len(tracks))+'</p>'
+        html += '<p id="songs_no">Number of tracks in this playlist: '+str(len(tracks))+'</p>'
         html += '<hr>'
         html += '<div class="col-lg-13 mx-auto">'
         counter = 0
@@ -284,8 +285,13 @@ def playlisthandler():
                 html += '</form>'
             html += '</div>'
             counter = counter + 1
+        
+        # show button for more elements when dynamic loading is active
+        if app.config["PLAYLISTS_DYNAMIC_LOADING"] == True:
+            html += '<div id="more" style="text-align:center">More</div>'
+
         html += '</div>'
-        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))
 
@@ -377,7 +383,7 @@ def recommendations():
             html += '<hr>'
             counter = counter + 1
         html += '</div>'
-        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))
 
@@ -411,6 +417,6 @@ def config():
             html += '<button type="submit" class="btn btn-info">Toggle - Currently: '+str(status)+'</button>'
             html += '<input type="hidden" name="config_entry" value="'+cfg+'">'
             html += '</form>'
-        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying())
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))

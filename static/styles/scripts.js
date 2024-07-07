@@ -36,21 +36,21 @@ function addSong(element_id, id, access_token, song_name, img_path) {
 
   // show notification
   iziToast.show({
-        theme: 'dark',
-        icon: 'icon-contacts',
-        title: decodeURI(song_name.replaceAll('+', ' ')),
-	message: ' added to queue',
-        displayMode: 2,
-        position: 'topCenter',
-        transitionIn: 'flipInX',
-        transitionOut: 'flipOutX',
-	image: img_path,
-        progressBarColor: 'rgb(0, 255, 184)',
-        imageWidth: 70,
-        layout: 2,
-        iconColor: 'rgb(0, 255, 184)',
-	timeout: timeout_target
-    });
+    theme: 'dark',
+    icon: 'icon-contacts',
+    title: decodeURI(song_name.replaceAll('+', ' ')),
+    message: ' added to queue',
+    displayMode: 2,
+    position: 'topCenter',
+    transitionIn: 'flipInX',
+    transitionOut: 'flipOutX',
+    image: img_path,
+    progressBarColor: 'rgb(0, 255, 184)',
+    imageWidth: 70,
+    layout: 2,
+    iconColor: 'rgb(0, 255, 184)',
+    timeout: timeout_target
+  });
 }
 
 function loading() {
@@ -221,3 +221,116 @@ window.onload = function fading() {
 		opacity: 1
 	});
 }
+
+window.addEventListener('scroll', function(e) {
+  if (Math.round(window.innerHeight + window.scrollY) >= document.body.scrollHeight) {
+    // return for now in case of playlists
+    if(window.location.pathname.includes("playlisthandler") && !PLAYLISTS_DYNAMIC_LOADING) return;
+
+    // show loading notification
+    iziToast.show({
+      theme: 'dark',
+      icon: 'icon-contacts',
+      title: 'Loading',
+      displayMode: 2,
+      position: 'topCenter',
+      transitionIn: 'fadeIn',
+      transitionOut: 'fadeOut',
+      timeout: 500
+    });
+    // set mouse cursor to loading
+    document.body.style.cursor='wait';
+
+    // determine offset
+    var replace_el = document.getElementById("more");
+    let offset = parseInt(replace_el.previousSibling.childNodes[0][0].id) + 1;
+
+    var url = "";
+    console.log(window.location.pathname.includes("tracks"));
+    if(window.location.pathname.includes("tracks")) {
+      url="https://api.spotify.com/v1/me/tracks?limit=50&offset=";
+    } else {
+      var playlist_id = new URLSearchParams(window.location.search).get('playlist');
+      url="https://api.spotify.com/v1/playlists/"+playlist_id+"/tracks?limit=50&offset=";
+    }
+
+    var html = "";
+    // pull saved songs
+    var Http = new XMLHttpRequest();
+    Http.responseType = 'json';
+    url_temp = url + offset;
+    console.log(url_temp);
+    Http.open("GET", url_temp);
+    Http.setRequestHeader('Accept', 'application/json');
+    Http.setRequestHeader('Content-Type', 'application/json');
+    Http.setRequestHeader('Authorization', 'Bearer '+access_token);
+
+    // get result of each request and fill variables
+    let counter = offset;
+    Http.onreadystatechange= function(e) {
+      var result = Http.response;
+      var items = result['items'];
+      if(items.length) {
+        items.forEach((song) => {
+          var name = song['track']['artists'][0]['name'] + ' - ' + song['track']['name'];
+          var uri = song['track']['uri'];
+          var cover_url = song['track']['album']['images'][0]['url'];
+
+          // generate HTML elements for each song
+          html += '<div>'
+          if (RECOMMENDATIONS)
+              html += '<form action="/recommendations" method="get">'
+          html += '<div>'
+          html += '<img class="fading-newelems'+offset+'" style="opacity:.0; width="40" height="40" src="'+cover_url+'" ondblclick="addSong('+counter+', \''+uri+'\', \''+access_token+'\', \''+name+'\', \''+cover_url+'\')" />'
+          html += '<p class="fading-newelems'+offset+'" style="opacity:.0; overflow-wrap: break-word; display:inline; padding-left: 10px;">'+name+'</p>'
+          html += '<button id="'+counter+'" class="btn btn-success right fading-buttons'+offset+'" style="opacity:.0; onclick="addSong(this.id, \''+uri+'\', \''+access_token+'\', \''+name+'\', \''+cover_url+'\')">Add to queue</button>'
+          if (RECOMMENDATIONS) {
+            html += '<input type="hidden" name="song_id" value="'+uri.split(':').at(-1)+'"/>'
+            html += '<button style="opacity:.0;" class="btn btn-info right fading-buttons'+offset+'">Recommendations</button>'
+          }
+          html += '<hr>'
+          html += '</div>'
+          if (RECOMMENDATIONS)
+              html += '</form>'
+          html += '</div>'
+          counter = parseInt(counter) + 1;
+        });
+
+        html += "<div id=\"more\" style=\"text-align:center\">More</div>";
+        document.getElementById("more").outerHTML = html;
+        if(window.location.pathname.includes("tracks")) {
+          document.getElementById("songs_no").innerHTML = "Here are your "+counter+" saved tracks";
+        } else {
+          document.getElementById("songs_no").innerHTML = "Number of tracks in this playlist: "+counter;
+        }
+
+        // animate new elements
+        var elements = document.querySelectorAll('.fading-newelems'+offset);
+        anime({
+          targets: elements,
+          duration: (el, i) => 20*i + 500,
+          delay: (el, i) => (200+50*i),
+          opacity: [0, 1],
+          easing: 'easeOutExpo',
+          translateX: [40, 0],
+          opacity: 1
+        });
+        var elements2 = document.querySelectorAll('.fading-buttons'+offset);
+        anime({
+          targets: elements2,
+          duration: (el, i) => 20*i + 500,
+          delay: (el, i) => (200+50*i),
+          opacity: [0, 1],
+          easing: 'easeOutExpo',
+          opacity: 1
+        });
+      } else {
+        iziToast.destroy();
+        html += "<div id=\"more\" style=\"text-align:center\">End reached</div>";
+        document.getElementById("more").outerHTML = html;
+      }
+      document.body.style.cursor='';
+    };
+    Http.send();
+  }
+});

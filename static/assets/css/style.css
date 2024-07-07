@@ -21333,3 +21333,7 @@ a:active {
       display: inline-block;
   }
 }
+
+#more {
+  color: #808080;
+}
