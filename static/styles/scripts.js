@@ -101,7 +101,6 @@ for(i;i<navLinks.length;i++){
   var lb = navLinks[i].href.split("/");
   if(lb[lb.length-1] == currentPage) {
     navLinks[i].classList.add("current");
-
   }
 }
 
@@ -142,7 +141,6 @@ if(SOCKET == true) {
       var currentProgress = e.offsetX;
       var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
 
-      console.log( percentageProgress );
       socket.emit('changeProgress', {'progress': percentageProgress})
   });
 
@@ -222,6 +220,8 @@ window.onload = function fading() {
 	});
 }
 
+// Scroll to the bottom of the page
+// Trigger fetching of additional songs
 window.addEventListener('scroll', function(e) {
   if (Math.round(window.innerHeight + window.scrollY) >= document.body.scrollHeight) {
     // return for now in case of playlists
@@ -246,7 +246,6 @@ window.addEventListener('scroll', function(e) {
     let offset = parseInt(replace_el.previousSibling.childNodes[0][0].id) + 1;
 
     var url = "";
-    console.log(window.location.pathname.includes("tracks"));
     if(window.location.pathname.includes("tracks")) {
       url="https://api.spotify.com/v1/me/tracks?limit=50&offset=";
     } else {
@@ -259,7 +258,6 @@ window.addEventListener('scroll', function(e) {
     var Http = new XMLHttpRequest();
     Http.responseType = 'json';
     url_temp = url + offset;
-    console.log(url_temp);
     Http.open("GET", url_temp);
     Http.setRequestHeader('Accept', 'application/json');
     Http.setRequestHeader('Content-Type', 'application/json');
@@ -311,7 +309,7 @@ window.addEventListener('scroll', function(e) {
           duration: (el, i) => 20*i + 500,
           delay: (el, i) => (200+50*i),
           opacity: [0, 1],
-          easing: 'easeOutExpo',
+          easing: 'easeInOutQuint',
           translateX: [40, 0],
           opacity: 1
         });
