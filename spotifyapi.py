@@ -266,6 +266,13 @@ class spotifyapi:
             return data['name']
         else:
             return ''
+        
+    def getPlaylistNoSongs(self, playlist_id):
+        data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id)
+        if data:
+            return int(data['tracks']['total'])
+        else:
+            return 0
 
     def getPlaylistTracks(self, playlist_id, playlists_dynamic_loading = False):
         if playlist_id in self.playlist_tracks:
