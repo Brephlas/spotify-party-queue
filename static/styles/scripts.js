@@ -279,9 +279,9 @@ window.addEventListener('scroll', function(e) {
           if (RECOMMENDATIONS)
               html += '<form action="/recommendations" method="get">'
           html += '<div>'
-          html += '<img class="fading-newelems'+offset+'" style="opacity:.0; width="40" height="40" src="'+cover_url+'" ondblclick="addSong('+counter+', \''+uri+'\', \''+access_token+'\', \''+name+'\', \''+cover_url+'\')" />'
+          html += '<img class="fading-newelems'+offset+'" style="opacity:.0; width="40" height="40" src="'+cover_url+'" ondblclick="addSong('+counter+', \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')" />'
           html += '<p class="fading-newelems'+offset+'" style="opacity:.0; overflow-wrap: break-word; display:inline; padding-left: 10px;">'+name+'</p>'
-          html += '<button id="'+counter+'" class="btn btn-success right fading-buttons'+offset+'" style="opacity:.0; onclick="addSong(this.id, \''+uri+'\', \''+access_token+'\', \''+name+'\', \''+cover_url+'\')">Add to queue</button>'
+          html += '<button id="'+counter+'" class="btn btn-success right fading-buttons'+offset+'" style="opacity:.0; onclick="addSong(this.id, \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')">Add to queue</button>'
           if (RECOMMENDATIONS) {
             html += '<input type="hidden" name="song_id" value="'+uri.split(':').at(-1)+'"/>'
             html += '<button style="opacity:.0;" class="btn btn-info right fading-buttons'+offset+'">Recommendations</button>'
@@ -307,7 +307,7 @@ window.addEventListener('scroll', function(e) {
         anime({
           targets: elements,
           duration: (el, i) => 20*i + 500,
-          delay: (el, i) => (200+50*i),
+          delay: (el, i) => (200+30*i),
           opacity: [0, 1],
           easing: 'easeInOutQuint',
           translateX: [40, 0],
@@ -317,7 +317,7 @@ window.addEventListener('scroll', function(e) {
         anime({
           targets: elements2,
           duration: (el, i) => 20*i + 500,
-          delay: (el, i) => (200+50*i),
+          delay: (el, i) => (200+30*i),
           opacity: [0, 1],
           easing: 'easeOutExpo',
           opacity: 1
