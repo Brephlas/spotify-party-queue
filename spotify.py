@@ -260,11 +260,6 @@ def playlisthandler():
     prev_url='/playlisthandler?playlist='+str(playlist_id)
     html = ''
     try:
-        # determine if dynamic loading should be used based on playlist size
-        if not app.config["PLAYLISTS_DYNAMIC_LOADING"]:
-            app.config["PLAYLISTS_DYNAMIC_LOADING"] = spotifyapi.getPlaylistNoSongs(playlist_id) > 100
-
-        # start getting playlist items
         tracks = spotifyapi.getPlaylistTracks(playlist_id, app.config["PLAYLISTS_DYNAMIC_LOADING"])
         tracks.reverse()
         html += '<p style="overflow-wrap: break-word; display:inline;"><h4>'+str(name)+'</h4></p>'
