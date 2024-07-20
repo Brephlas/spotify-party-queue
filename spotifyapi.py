@@ -266,13 +266,17 @@ class spotifyapi:
             return data['name']
         else:
             return ''
+        
+    def getPlaylistNoSongs(self, playlist_id):
+        data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id)
+        if data:
+            return int(data['tracks']['total'])
+        else:
+            return 0
 
     def getPlaylistTracks(self, playlist_id, playlists_dynamic_loading = False):
         if playlist_id in self.playlist_tracks:
-            data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks?limit=1')
-            for track in data['items']:
-                uri = track['track']['uri']
-            if uri == self.playlist_tracks[playlist_id][0][2]:
+            if len(self.playlist_tracks[playlist_id]) == self.getPlaylistNoSongs(playlist_id):
                 # if the first local stored song matches with the api's first stored song
                 # there was no change made and we can use the local list
                 return self.playlist_tracks[playlist_id]
@@ -327,6 +331,7 @@ class spotifyapi:
                         # break out of loop as all songs are collected
                         break
                     counter = counter + 1
+                self.playlist_tracks[playlist_id].reverse()
             return self.playlist_tracks[playlist_id]
         except noauthException:
             raise noauthException

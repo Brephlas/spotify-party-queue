@@ -261,7 +261,6 @@ def playlisthandler():
     html = ''
     try:
         tracks = spotifyapi.getPlaylistTracks(playlist_id, app.config["PLAYLISTS_DYNAMIC_LOADING"])
-        tracks.reverse()
         html += '<p style="overflow-wrap: break-word; display:inline;"><h4>'+str(name)+'</h4></p>'
         html += '<p id="songs_no">Number of tracks in this playlist: '+str(len(tracks))+'</p>'
         html += '<hr>'
