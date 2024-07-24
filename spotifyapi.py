@@ -281,7 +281,6 @@ class spotifyapi:
                 # there was no change made and we can use the local list
                 return self.playlist_tracks[playlist_id]
         try:
-            self.playlist_tracks = {}
             self.playlist_tracks[playlist_id] = []
             counter = 0
             # while there are saved songs left to collect
