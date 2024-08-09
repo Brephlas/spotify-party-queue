@@ -220,12 +220,21 @@ window.onload = function fading() {
 	});
 }
 
+let lastY = 0;
 // Scroll to the bottom of the page
 // Trigger fetching of additional songs
 window.addEventListener('scroll', function(e) {
-  if (Math.round(window.innerHeight + window.scrollY) >= document.body.scrollHeight) {
+  // check if end was nearly reached (and function not already ran)
+  let triggerY = window.screen.height/5;
+  if (Math.round(window.innerHeight + window.scrollY) >= document.body.scrollHeight - triggerY && (Math.abs(lastY - window.scrollY) > triggerY || lastY == 0) ) {
+    // store last scroll value
+    lastY = window.scrollY;
+
     // return for now in case of playlists
     if(window.location.pathname.includes("playlisthandler") && !PLAYLISTS_DYNAMIC_LOADING) return;
+    
+    // return if not in any track view
+    if(!window.location.pathname.includes("tracks") && !window.location.pathname.includes("playlisthandler")) return;
 
     // show loading notification
     iziToast.show({
