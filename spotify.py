@@ -163,15 +163,17 @@ def tracks():
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
+            html += '<div class="btn-group right" role="group">'
             html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info right">Recommendations</button>'
-            html += '<hr>'
+            html += '</div>'
             html += '</div>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '</form>'
             html += '</div>'
+            html += '<hr style="overflow: hidden; position: relative;">'
             counter = counter + 1
         html += '<div id="more" style="text-align:center">More</div>'
         html += '</div>'
@@ -274,15 +276,17 @@ def playlisthandler():
             artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
-            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            html += '<div class="btn-group right" role="group">'
+            html += '<button id="'+str(counter)+'" class="btn btn-success" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
-                html += '<button class="btn btn-info right">Recommendations</button>'
-            html += '<hr>'
+                html += '<button class="btn btn-info">Recommendations</button>'
+            html += '</div>'
             html += '</div>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '</form>'
             html += '</div>'
+            html += '<hr style="overflow: hidden; position: relative;">'
             counter = counter + 1
         
         # show button for more elements when dynamic loading is active

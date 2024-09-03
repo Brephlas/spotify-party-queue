@@ -11,9 +11,9 @@ I was tired of saying "please make sure to not click on a song" when i was givin
 
 # Prerequisites
 - Python3 
-     - `sudo apt install python3 python3-pip`
-- flask and configparser 
-     - `pip3 install flask ConfigParser`
+    - `sudo apt install python3 python3-pip`
+- packages
+    - `python3 -m pip install flask==2.2.2 Werkzeug==2.2.2 python-dotenv spotipy flask-session flask-socketio gevent-websocket ConfigParser`
 
 # Install
 1. Create a spotify application in the spotify [developer dashboard](https://developer.spotify.com/dashboard/applications)
