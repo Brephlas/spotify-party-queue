@@ -193,13 +193,14 @@ def playlists():
         # create copy of playlists to avoid reversing the returned global playlists
         playlists = copy(spotifyapi.getPlaylists())
         playlists.reverse()
+        html += '<input type="text" id="search" class="border form-control input" onkeyup="search()" placeholder="Search for playlist.." title="Type in a playlist name">'
         html += '<div class="row">'
         for playlist in playlists:
             cover_path = coverImage(playlist[0])
             html += '<div class="col-sm-2 grid-margin">'
             html += '<div class="card">'
             html += '<div class="card-body">'
-            html += '<p>'+str(playlist[1])+'</p>'
+            html += '<p class="playlistname">'+str(playlist[1])+'</p>'
             html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+str(playlist[0])+'" onclick="loading(\''+spotifyapi.getAccessToken()+'\')"><img class="responsive" src="'+cover_path+'"/></a>'
             html += '</div>'
             html += '</div>'

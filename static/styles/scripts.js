@@ -53,6 +53,22 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   });
 }
 
+// search function for playlists
+function search() {
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById("search");
+  filter = input.value.toUpperCase();
+  li = document.getElementsByClassName("playlistname");
+  for (i = 0; i < li.length; i++) {
+      txtValue = li[i].textContent || li[i].innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          li[i].parentNode.parentNode.parentNode.style.display = "";
+      } else {
+          li[i].parentNode.parentNode.parentNode.style.display = "none";
+      }
+  }
+}
+
 function loading() {
 	// set mouse cursor to loading
 	document.body.style.cursor='wait';
