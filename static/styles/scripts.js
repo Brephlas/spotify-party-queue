@@ -278,7 +278,7 @@ async function reloadImg(url) {
 }
 
 if(SOCKET == true) {
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+  var socket = io.connect(location.protocol + '//' + location.hostname + ':' + location.port);
 
   // click event handler for the progress bar
   // progress bar click listener
@@ -301,8 +301,7 @@ if(SOCKET == true) {
 
 
   // Update current played song
-
-  const interval = setInterval(function() {
+  setInterval(function() {
     socket.emit( 'updatesong', {} )
     socket.emit( 'updateprogress', {} )
   }, 10000); // 10 seconds
@@ -311,7 +310,6 @@ if(SOCKET == true) {
     socket.emit( 'updatesong', {} )
   } )
   socket.on( 'updatesong_response', function( msg ) {
-
     // update icon as indicator for playback
     var icon = document.querySelector('img[alt="logo"]');
     if(msg == 'Nothing playing right now') {
@@ -335,7 +333,8 @@ if(SOCKET == true) {
     document.title = "Spotifyqueue - "+msg;
   })
 
-  const interval_progress = setInterval(function() {
+  // update progress bar
+  setInterval(function() {
     socket.emit( 'updateprogress', {} )
   }, 5000); // 5 seconds
 
@@ -391,3 +390,25 @@ function eKeyUp(e){
     }
   }
 }
+
+previous_click_opened = null;
+// detect click outside navbar
+$(document).on("click", function (event)
+{
+  if ($(event.target).closest('.element').length == 0)
+  {
+    // if click is outside of navbar close it
+    let navbar = document.getElementsByClassName("sidebar active");
+    let sidebar_opened = $(event.target).hasClass('sidebar-toggler');
+    // check if sidebar should be closed
+    if (!$(event.target).is("nav") && navbar.length == 1 && !sidebar_opened && previous_click_opened) {
+      // close nav bar
+      navbar[0].classList.remove("active");
+      previous_click_opened = false;
+    }
+    // check if the last click opened the sidebar
+    if (sidebar_opened) {
+      previous_click_opened = true;
+    }
+  }
+});
