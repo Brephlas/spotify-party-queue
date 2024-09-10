@@ -63,8 +63,10 @@ function search() {
       txtValue = li[i].textContent || li[i].innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
           li[i].parentNode.parentNode.parentNode.style.display = "";
+          li[i].classList.add("search_listelement");
       } else {
           li[i].parentNode.parentNode.parentNode.style.display = "none";
+          li[i].classList.remove("search_listelement");
       }
   }
 }
@@ -108,18 +110,6 @@ function loading() {
 	}
 }
 
-var url = window.location.href.split("/"); //replace string with location.href
-var navLinks = document.getElementsByTagName("nav")[0].getElementsByTagName("a");
-// you also could use something other than the <nav> element
-var i=0;
-var currentPage = url[url.length - 1]
-for(i;i<navLinks.length;i++){
-  var lb = navLinks[i].href.split("/");
-  if(lb[lb.length-1] == currentPage) {
-    navLinks[i].classList.add("current");
-  }
-}
-
 // get/set state of the sidebar
 function toggleSidebar() {
   try {
@@ -132,108 +122,6 @@ function toggleSidebar() {
   } catch {
     localStorage.setItem('sidebar', 'open');
   }
-}
-
-// set the sidebar on page load
-if (localStorage.getItem('sidebar') == "closed") {
-  document.body.classList.add("sidebar-icon-only");
-} else {
-  document.body.classList.remove("sidebar-icon-only");
-}
-
-async function reloadImg(url) {
-  await fetch(url, { cache: 'reload', mode: 'no-cors' })
-  document.body.querySelectorAll('img[alt="logo"]')
-    .forEach(img => img.src = url)
-}
-
-if(SOCKET == true) {
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-
-  // click event handler for the progress bar
-  // progress bar click listener
-  document.getElementById('progress').addEventListener('click', function (e) {
-      var maxWidth = document.getElementById("progress-container").offsetWidth;
-      var currentProgress = e.offsetX;
-      var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
-
-      socket.emit('changeProgress', {'progress': percentageProgress})
-  });
-
-  // progress bar click listener (mobile)
-  document.getElementById('progress-mobile').addEventListener('click', function (e) {
-      var maxWidth = document.getElementById("progress-mobile-container").offsetWidth;
-      var currentProgress = e.offsetX;
-      var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
-
-      socket.emit('changeProgress', {'progress': percentageProgress})
-  });
-
-
-  // Update current played song
-
-  const interval = setInterval(function() {
-    socket.emit( 'updatesong', {} )
-    socket.emit( 'updateprogress', {} )
-  }, 10000); // 10 seconds
-
-  socket.on( 'connect', function() {
-    socket.emit( 'updatesong', {} )
-  } )
-  socket.on( 'updatesong_response', function( msg ) {
-
-    // update icon as indicator for playback
-    var icon = document.querySelector('img[alt="logo"]');
-    if(msg == 'Nothing playing right now') {
-	    // white icon because no playback
-	    icon.src = '/static/assets/img/menuicon.png';
-    } else {
-	    // green icon because music is playing
-	    icon.src = '/static/assets/img/menuicon_green.png';
-    }
-    // update cache
-    reloadImg(icon.src);
-
-    $('#current').text(msg)
-    $('#current_mainpage').text(msg)
-    document.title = "Spotifyqueue - "+msg;
-  })
-
-  const interval_progress = setInterval(function() {
-    socket.emit( 'updateprogress', {} )
-  }, 5000); // 5 seconds
-
-  socket.on( 'connect', function() {
-    socket.emit( 'updateprogress', {} )
-  } )
-  socket.on( 'updateprogress_response', function( msg ) {
-    $('#progress').attr('aria-valuenow', msg).css('width', msg+'%');
-    $('#progress-mobile').attr('aria-valuenow', msg).css('width', msg+'%');
-  })
-}
-
-window.onload = function fading() {
-	var elements = document.querySelectorAll('.fading');
-	anime({
-		targets: elements,
-		duration: (el, i) => 10*i + 500,
-//delay: (el, i) => 100+30*i,
-		delay: anime.stagger(30),
-		opacity: [0, 1],
-		easing: 'easeOutExpo',
-		translateX: [40, 0],
-		opacity: 1
-	});
-	var elements = document.querySelectorAll('.fading-slow');
-	anime({
-		targets: elements,
-		duration: (el, i) => 10*i + 500,
-		delay: (el, i) => (100+30*i)/(30+i),
-		opacity: [0, 1],
-		easing: 'easeOutExpo',
-		translateX: [40, 0],
-		opacity: 1
-	});
 }
 
 let lastY = 0;
@@ -357,3 +245,137 @@ window.addEventListener('scroll', function(e) {
     Http.send();
   }
 });
+
+var url = window.location.href.split("/"); //replace string with location.href
+var navLinks = document.getElementsByTagName("nav")[0].getElementsByTagName("a");
+// you also could use something other than the <nav> element
+var i=0;
+var currentPage = url[url.length - 1]
+for(i;i<navLinks.length;i++){
+  var lb = navLinks[i].href.split("/");
+  if(lb[lb.length-1] == currentPage) {
+    navLinks[i].classList.add("current");
+  }
+}
+
+// set the sidebar on page load
+if (localStorage.getItem('sidebar') == "closed") {
+  document.body.classList.add("sidebar-icon-only");
+} else {
+  document.body.classList.remove("sidebar-icon-only");
+}
+
+async function reloadImg(url) {
+  await fetch(url, { cache: 'reload', mode: 'no-cors' })
+  document.body.querySelectorAll('img[alt="logo"]')
+    .forEach(img => img.src = url)
+}
+
+if(SOCKET == true) {
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+  // click event handler for the progress bar
+  // progress bar click listener
+  document.getElementById('progress').addEventListener('click', function (e) {
+      var maxWidth = document.getElementById("progress-container").offsetWidth;
+      var currentProgress = e.offsetX;
+      var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
+
+      socket.emit('changeProgress', {'progress': percentageProgress})
+  });
+
+  // progress bar click listener (mobile)
+  document.getElementById('progress-mobile').addEventListener('click', function (e) {
+      var maxWidth = document.getElementById("progress-mobile-container").offsetWidth;
+      var currentProgress = e.offsetX;
+      var percentageProgress = Math.round((currentProgress/maxWidth) * 100);
+
+      socket.emit('changeProgress', {'progress': percentageProgress})
+  });
+
+
+  // Update current played song
+
+  const interval = setInterval(function() {
+    socket.emit( 'updatesong', {} )
+    socket.emit( 'updateprogress', {} )
+  }, 10000); // 10 seconds
+
+  socket.on( 'connect', function() {
+    socket.emit( 'updatesong', {} )
+  } )
+  socket.on( 'updatesong_response', function( msg ) {
+
+    // update icon as indicator for playback
+    var icon = document.querySelector('img[alt="logo"]');
+    if(msg == 'Nothing playing right now') {
+	    // white icon because no playback
+	    icon.src = '/static/assets/img/menuicon.png';
+    } else {
+	    // green icon because music is playing
+	    icon.src = '/static/assets/img/menuicon_green.png';
+    }
+    // update cache
+    reloadImg(icon.src);
+
+    $('#current').text(msg)
+    $('#current_mainpage').text(msg)
+    document.title = "Spotifyqueue - "+msg;
+  })
+
+  const interval_progress = setInterval(function() {
+    socket.emit( 'updateprogress', {} )
+  }, 5000); // 5 seconds
+
+  socket.on( 'connect', function() {
+    socket.emit( 'updateprogress', {} )
+  } )
+  socket.on( 'updateprogress_response', function( msg ) {
+    $('#progress').attr('aria-valuenow', msg).css('width', msg+'%');
+    $('#progress-mobile').attr('aria-valuenow', msg).css('width', msg+'%');
+  })
+}
+
+window.onload = function fading() {
+	var elements = document.querySelectorAll('.fading');
+	anime({
+		targets: elements,
+		duration: (el, i) => 10*i + 500,
+//delay: (el, i) => 100+30*i,
+		delay: anime.stagger(30),
+		opacity: [0, 1],
+		easing: 'easeOutExpo',
+		translateX: [40, 0],
+		opacity: 1
+	});
+	var elements = document.querySelectorAll('.fading-slow');
+	anime({
+		targets: elements,
+		duration: (el, i) => 10*i + 500,
+		delay: (el, i) => (100+30*i)/(30+i),
+		opacity: [0, 1],
+		easing: 'easeOutExpo',
+		translateX: [40, 0],
+		opacity: 1
+	});
+}
+
+// place cursor in search field for playlists
+if(window.location.pathname.includes("playlists")) {
+	var search_input = document.querySelector('#search');
+  search_input.focus();
+}
+
+// action when pressed enter
+$('#search').on('keyup', eKeyUp);
+function eKeyUp(e){
+  // when enter was pressed inside input
+  if(e.which == 13) {    
+    // get all results
+	  var playlists = document.querySelectorAll(".search_listelement");
+    // and if one element is left, click it
+    if(playlists.length == 1) {
+      playlists[0].nextElementSibling.click();
+    }
+  }
+}
