@@ -184,6 +184,7 @@ window.addEventListener('scroll', function(e) {
     let counter = offset;
     Http.onreadystatechange= function(e) {
       var result = Http.response;
+      if(!result) return;
       var items = result['items'];
       if(items.length) {
         items.forEach((song) => {
