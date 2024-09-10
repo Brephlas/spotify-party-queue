@@ -20,8 +20,12 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   Http.send();
 
   if(REMOVE_ELEMENTS == true) {
-	  button_div_parent = button.parentElement;
+	  button_div_parent = button.parentElement.parentElement.parentElement.parentElement;
+	  button_hr_next = button.parentElement.parentElement.parentElement.parentElement.nextElementSibling;
+    console.log(button_div_parent);
+    console.log(button_hr_next);
 	  button_div_parent.remove();
+	  button_hr_next.remove();
   } else {
 	  button.disabled = true;
 	  button.textContent = "Added!";
