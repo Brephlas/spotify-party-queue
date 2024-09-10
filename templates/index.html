@@ -72,12 +72,12 @@
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <div id="logo" class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-          <p id="logo_img" class="sidebar-brand brand-logo" onclick="loading();window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /> Spotifyqueue</p>
-          <p id="logo_img_mini" class="sidebar-brand brand-logo-mini" onclick="loading();window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /></p>
+          <p id="logo_img" class="sidebar-brand brand-logo" onclick="showpageload();window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /> Spotifyqueue</p>
+          <p id="logo_img_mini" class="sidebar-brand brand-logo-mini" onclick="showpageload();window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /></p>
         </div>
         <ul class="nav">
           <li class="nav-item menu-items">
-            <a class="nav-link" href="/" onclick="loading()">
+            <a class="nav-link" href="/" onclick="showpageload()">
               <span class="menu-icon">
                 <i class="mdi mdi-magnify"></i>
               </span>
@@ -86,7 +86,7 @@
           </li>
           {% if config["TRACKS"] == True %}
           <li class="nav-item menu-items">
-            <a class="nav-link" href="/tracks" onclick="loading()">
+            <a class="nav-link" href="/tracks" onclick="showpageload()">
               <span class="menu-icon">
                 <i class="mdi mdi-playlist-play"></i>
               </span>
@@ -96,7 +96,7 @@
           {% endif %}
           {% if config["PLAYLISTS"] == True %}
           <li class="nav-item menu-items bottom">
-            <a class="nav-link" href="/playlists" onclick="loading()">
+            <a class="nav-link" href="/playlists" onclick="showpageload()">
               <span class="menu-icon">
                 <i class="mdi mdi-playlist-music"></i>
               </span>
@@ -106,7 +106,7 @@
           {% endif %}
           {% if config["PRIVATE"] == True %}
           <li class="nav-item menu-items bottom">
-            <a class="nav-link" href="/config" onclick="loading()">
+            <a class="nav-link" href="/config" onclick="showpageload()">
               <span class="menu-icon">
                 <i class="mdi mdi-cogs"></i>
               </span>
@@ -121,7 +121,7 @@
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar p-0 fixed-top d-flex flex-row">
           <div id="logo-mini-div" class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-            <img id="logo-mini" style="height:1em;" src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" onclick="loading();window.location.replace('/');" />
+            <img id="logo-mini" style="height:1em;" src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" onclick="showpageload();window.location.replace('/');" />
           </div>
           <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
             <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">

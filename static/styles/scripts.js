@@ -75,7 +75,7 @@ function search() {
   }
 }
 
-function loading() {
+function showpageload() {
 	// set mouse cursor to loading
 	document.body.style.cursor='wait';
 
@@ -316,13 +316,19 @@ if(SOCKET == true) {
     var icon = document.querySelector('img[alt="logo"]');
     if(msg == 'Nothing playing right now') {
 	    // white icon because no playback
-	    icon.src = '/static/assets/img/menuicon.png';
+      if(!icon.src.includes('/static/assets/img/menuicon.png')) {
+        icon.src = '/static/assets/img/menuicon.png';
+        // update cache
+        reloadImg(icon.src);
+      }
     } else {
 	    // green icon because music is playing
-	    icon.src = '/static/assets/img/menuicon_green.png';
+      if(!icon.src.includes('/static/assets/img/menuicon_green.png')) {
+        icon.src = '/static/assets/img/menuicon_green.png';
+        // update cache
+        reloadImg(icon.src);
+      }
     }
-    // update cache
-    reloadImg(icon.src);
 
     $('#current').text(msg)
     $('#current_mainpage').text(msg)
