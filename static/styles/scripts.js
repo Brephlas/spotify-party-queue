@@ -102,7 +102,7 @@ function loading() {
 	div_to_display_loading = "logo-mini-div";
 	document.getElementById(div_to_display_loading).style.backgroundRepeat = 'no-repeat';
 	document.getElementById(div_to_display_loading).style.backgroundSize = 'cover';
-	// check if there is an active playback
+	// check if there is an active playback 
 	if (
 	  (
 	    document.documentElement.textContent || document.documentElement.innerText
@@ -160,7 +160,7 @@ window.addEventListener('scroll', function(e) {
 
     // determine offset
     var replace_el = document.getElementById("more");
-    let offset = parseInt(replace_el.previousSibling.childNodes[0][0].id) + 1;
+    let offset = parseInt(replace_el.previousSibling.previousSibling.childNodes[0][0].id) + 1;
 
     var url = "";
     if(window.location.pathname.includes("tracks")) {
@@ -198,16 +198,18 @@ window.addEventListener('scroll', function(e) {
           html += '<div>'
           html += '<img class="fading-newelems'+offset+'" style="opacity:.0; width="40" height="40" src="'+cover_url+'" ondblclick="addSong('+counter+', \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')" />'
           html += '<p class="fading-newelems'+offset+'" style="opacity:.0; overflow-wrap: break-word; display:inline; padding-left: 10px;">'+name+'</p>'
+          html += '<div class="btn-group right" role="group">'
           html += '<button id="'+counter+'" class="btn btn-success right fading-buttons'+offset+'" style="opacity:.0; onclick="addSong(this.id, \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')">Add to queue</button>'
           if (RECOMMENDATIONS) {
             html += '<input type="hidden" name="song_id" value="'+uri.split(':').at(-1)+'"/>'
             html += '<button style="opacity:.0;" class="btn btn-info right fading-buttons'+offset+'">Recommendations</button>'
           }
-          html += '<hr>'
+          html += '</div>'
           html += '</div>'
           if (RECOMMENDATIONS)
               html += '</form>'
           html += '</div>'
+          html += '<hr style="overflow: hidden; position: relative;">'
           counter = parseInt(counter) + 1;
         });
 
