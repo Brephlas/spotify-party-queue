@@ -62,80 +62,80 @@ function eKeyUp(e){
       });
    } else if(e.which == 17) {
       if(~window.location.href.indexOf("playlists")) {
-               // use ctrl to click a playlist in case playlists are listed
-               var selected_exists = false;
-               $('.row').children('div').each(function(i) {
-                  if(~$(this).children().children().children('p').text().indexOf(">")) {
-                           selected_exists = true;
-                           // click the link of the playlist
-                           $(this).children().children().children('p').next('a')[0].click();
-                           return false;
-                  }
-               });
+         // use ctrl to click a playlist in case playlists are listed
+         var selected_exists = false;
+         $('.row').children('div').each(function(i) {
+            if(~$(this).children().children().children('p').text().indexOf(">")) {
+               selected_exists = true;
+               // click the link of the playlist
+               $(this).children().children().children('p').next('a')[0].click();
+               return false;
+            }
+         });
       } else {
-               // ctrl click (add current element to queue)
-               var selected_exists = false;
-               $('.col-lg-13.mx-auto').children('div').children('form').children('div').children('p').each(function(i) {
-                  if(~$(this).text().indexOf(">")) {
-                           if(!$(this).next().is(":disabled")) {
-                                 selected_exists = true;
-                                 // select next element
-                                 next_song_title = $(this).parent().parent().parent().next().next().children("form").children("div").children("p");
-                                 next_song_title.text('> '+next_song_title.text());
-                                 // click "Add to queue" button
-                                 $(this).siblings('div').children('button')[0].click();
-                           return false;
-                           } else {
-                                 console.log("Song was already added");
-                           }
-                  }
-               });
+         // ctrl click (add current element to queue)
+         var selected_exists = false;
+         $('.col-lg-13.mx-auto').children('div').children('form').children('div').children('p').each(function(i) {
+            if(~$(this).text().indexOf(">")) {
+               if(!$(this).next().is(":disabled")) {
+                  selected_exists = true;
+                  // select next element
+                  next_song_title = $(this).parent().parent().parent().next().next().children("form").children("div").children("p");
+                  next_song_title.text('> '+next_song_title.text());
+                  // click "Add to queue" button
+                  $(this).siblings('div').children('button')[0].click();
+               return false;
+               } else {
+                  console.log("Song was already added");
+               }
+            }
+         });
       }
       if(!selected_exists) {
          console.log("Nothing selected");
       }
    } else if(e.which == 37) {
-            // arrow down
-            var counter = 0;
-            var selected_exists = false;
-            $('.row').children('div').each(function(i) {
-                  counter = counter + 1;
-                  if(~$(this).children().children().children('p').text().indexOf(">")) { selected_exists = true; return false; }
-            });
-            var counter2 = 1;
-            $('.row').children('div').each(function(i) {
-                  if(!selected_exists) {
-                     $(this).children().children().children('p').text('> '+$(this).children().children().children('p').text());
-                     return false;
-                  }
-                  if(counter2 + 1 == counter) {
-                     $(this).children().children().children('p').text('> '+$(this).children().children().children('p').text());
-                  } else if(counter2 == counter) {
-                     $(this).children().children().children('p').text($(this).children().children().children('p').text().substring(2));
-                  }
-                  counter2 = counter2 + 1;
-            });
+      // arrow down
+      var counter = 0;
+      var selected_exists = false;
+      $('.row').children('div').each(function(i) {
+         counter = counter + 1;
+         if(~$(this).children().children().children('p').text().indexOf(">")) { selected_exists = true; return false; }
+      });
+      var counter2 = 1;
+      $('.row').children('div').each(function(i) {
+         if(!selected_exists) {
+            $(this).children().children().children('p').text('> '+$(this).children().children().children('p').text());
+            return false;
+         }
+         if(counter2 + 1 == counter) {
+            $(this).children().children().children('p').text('> '+$(this).children().children().children('p').text());
+         } else if(counter2 == counter) {
+            $(this).children().children().children('p').text($(this).children().children().children('p').text().substring(2));
+         }
+         counter2 = counter2 + 1;
+      });
    } else if(e.which == 39) {
-            // arrow down
-            var counter = 0;
-            var selected_exists = false;
-            $('.row').children('div').each(function(i) {
-                  counter = counter + 1;
-                  if(~$(this).children().children().children('p').text().indexOf(">")) { selected_exists = true; return false; }
-            });
-            var counter2 = 1;
-            $('.row').children('div').each(function(i) {
-                  if(!selected_exists) {
-                     $(this).children().children().children('p').text('> '+$(this).children().children().children('p').text());
-                     return false;
-                  }
-                  if(counter2 - 1 == counter) {
-                     $(this).children().children().children('p').text('> '+$(this).children().children().children('p').text());
-                  } else if(counter2 == counter) {
-                     $(this).children().children().children('p').text($(this).children().children().children('p').text().substring(2));
-                  }
-                  counter2 = counter2 + 1;
-            });
+      // arrow down
+      var counter = 0;
+      var selected_exists = false;
+      $('.row').children('div').each(function(i) {
+         counter = counter + 1;
+         if(~$(this).children().children().children('p').text().indexOf(">")) { selected_exists = true; return false; }
+      });
+      var counter2 = 1;
+      $('.row').children('div').each(function(i) {
+         if(!selected_exists) {
+            $(this).children().children().children('p').text('> '+$(this).children().children().children('p').text());
+            return false;
+         }
+         if(counter2 - 1 == counter) {
+            $(this).children().children().children('p').text('> '+$(this).children().children().children('p').text());
+         } else if(counter2 == counter) {
+            $(this).children().children().children('p').text($(this).children().children().children('p').text().substring(2));
+         }
+         counter2 = counter2 + 1;
+      });
    }
 }
 
