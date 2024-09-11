@@ -413,3 +413,19 @@ $(document).on("click", function (event)
     }
   }
 });
+
+// drag listener
+var divOverlay = document.getElementById ("#content");
+var dragged = false
+var oldX = 0;
+window.addEventListener('mousedown', function (e) { oldX = e.pageX; dragged = false })
+document.addEventListener('mousemove', function () { dragged = true })
+window.addEventListener('mouseup', function(e) {
+  if (Math.abs((e.pageX - oldX)) > 100 ) {
+    if (dragged == true && e.pageX < oldX) {
+      history.forward();
+    } else if (dragged == true && e.pageX > oldX) {
+      history.back();
+    }
+  }   
+})
