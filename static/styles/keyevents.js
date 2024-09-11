@@ -79,6 +79,9 @@ function eKeyUp(e){
                   if(~$(this).text().indexOf(">")) {
                            if(!$(this).next().is(":disabled")) {
                                  selected_exists = true;
+                                 // select next element
+                                 next_song_title = $(this).parent().parent().parent().next().next().children("form").children("div").children("p");
+                                 next_song_title.text('> '+next_song_title.text());
                                  // click "Add to queue" button
                                  $(this).siblings('div').children('button')[0].click();
                            return false;
