@@ -1,3 +1,21 @@
+async function fadeOutAnimation(button) {
+  var btn = button.parentElement;
+  console.log(btn);
+  const finish_animation = anime({
+    targets: btn,
+    duration: 500,
+    delay: 50,
+    opacity: [1, 0],
+    easing: 'easeOutExpo',
+    translateX: [0, 40],
+    opacity: 0
+  }).finished;
+  await Promise.all([finish_animation]);
+  // remove row after animation
+  btn.nextElementSibling.remove();
+  btn.remove();
+}
+
 function addSong(element_id, id, access_token, song_name, img_path) {
   // check if there is an active playback
   if (
@@ -17,16 +35,18 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   Http.setRequestHeader('Accept', 'application/json');
   Http.setRequestHeader('Content-Type', 'application/json');
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
-  Http.send();
+  //Http.send();
 
   if(REMOVE_ELEMENTS == true) {
-	  button_div_parent = button.parentElement.parentElement.parentElement.parentElement;
-	  button_hr_next = button.parentElement.parentElement.parentElement.parentElement.nextElementSibling;
-    console.log(button_div_parent);
-    console.log(button_hr_next);
-	  button_div_parent.remove();
-	  button_hr_next.remove();
+    // play fade out animation when elements are removed
+    fadeOutAnimation(button);
   } else {
+    // rotate animation when button clicked and elements are not removed
+    anime({
+      targets: button,
+      rotateX: [{ value: "1turn", duration: 100 }]
+    });
+
 	  button.disabled = true;
 	  button.textContent = "Added!";
   }
@@ -418,8 +438,8 @@ $(document).on("click", function (event)
 var divOverlay = document.getElementById ("#content");
 var dragged = false
 var oldX = 0;
-window.addEventListener('mousedown', function (e) { oldX = e.pageX; dragged = false })
-document.addEventListener('mousemove', function () { dragged = true })
+window.addEventListener('mousedown', function (e) { oldX = e.pageX; dragged = false });
+document.addEventListener('mousemove', function () { dragged = true });
 window.addEventListener('mouseup', function(e) {
   if (Math.abs((e.pageX - oldX)) > 100 ) {
     if (dragged == true && e.pageX < oldX) {
@@ -428,4 +448,4 @@ window.addEventListener('mouseup', function(e) {
       history.back();
     }
   }   
-})
+});
