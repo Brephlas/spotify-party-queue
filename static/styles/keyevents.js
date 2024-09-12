@@ -26,13 +26,23 @@ function eKeyUp(e){
       var counter2 = 1;
       $('.col-lg-13.mx-auto').children('div').children('form').children('div').children('p').each(function(i) {
          if(!selected_exists) {
+            // add marker for current element
+            $(this).parent().parent().css("border", "1px solid #00d25b");
+            // add text marker for current element
             $(this).text('> '+$(this).text());
             return false;
          }
          if(counter2 - 1 == counter) {
+            // add marker for current element
+            console.log($(this).parent().parent());
+            $(this).parent().parent().css("border", "1px solid #00d25b");
+            // add text marker for current element
             $(this).text('> '+$(this).text());
          window.scrollTo(0, $(this).offset().top-300);
          } else if(counter2 == counter) {
+            // remove border marker for current element
+            $(this).parent().parent().css("border", "0px");
+            // remove text marker for current element
             $(this).text($(this).text().substring(2));
          }
          counter2 = counter2 + 1;
@@ -49,13 +59,22 @@ function eKeyUp(e){
       var counter2 = 1;
       $('.col-lg-13.mx-auto').children('div').children('form').children('div').children('p').each(function(i) {
          if(!selected_exists) {
+            // add marker for current element
+            $(this).parent().parent().css("border", "1px solid #00d25b");
+            // add text marker for current element
             $(this).text('> '+$(this).text());
             return false;
          }
          if(counter2 + 1 == counter) {
+            // add marker for current element
+            $(this).parent().parent().css("border", "1px solid #00d25b");
+            // add text marker for current element
             $(this).text('> '+$(this).text());
       window.scrollTo(0, $(this).offset().top-250);
          } else if(counter2 == counter) {
+            // remove border marker for current element
+            $(this).parent().parent().css("border", "0px");
+            // remove text marker for current element
             $(this).text($(this).text().substring(2));
          }
          counter2 = counter2 + 1;
