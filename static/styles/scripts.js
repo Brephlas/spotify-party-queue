@@ -1,6 +1,5 @@
 async function fadeOutAnimation(button) {
-  var btn = button.parentElement;
-  console.log(btn);
+  var btn = button.parentElement.parentElement.parentElement.parentElement;
   const finish_animation = anime({
     targets: btn,
     duration: 500,
@@ -35,7 +34,7 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   Http.setRequestHeader('Accept', 'application/json');
   Http.setRequestHeader('Content-Type', 'application/json');
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
-  //Http.send();
+  Http.send();
 
   if(REMOVE_ELEMENTS == true) {
     // play fade out animation when elements are removed
