@@ -86,17 +86,24 @@ def addNextSong():
     name = request.form.get('name')
     spotifyapi.addNextSong(name)
     return 'Ok'
-
+    
 @app.route('/')
+def root():
+    if not spotifyapi.isAuthenticated():
+        return redirect(url_for('auth'))
+    else:
+        return redirect('/search', code=302)
+
+@app.route('/search')
 def search():
     global prev_url
     # set prev_url for redirect after authentication
-    prev_url = '/'
+    prev_url = '/search'
     # check if user is authenticated
     if not spotifyapi.isAuthenticated():
         return redirect(url_for('auth'))
     # add search bar
-    html = '<form action="/" method="get">'
+    html = '<form action="/search" method="get">'
     html += '<div class="input-group">'
     html += '<input id="1" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name=\'q\'/>'
     html += '<input type="hidden" name="type" value="track"/>'
@@ -126,7 +133,7 @@ def search():
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<div class="btn-group right" role="group">'
-            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            html += '<button type="button" id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info right">Recommendations</button>'
@@ -166,7 +173,47 @@ def tracks():
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<div class="btn-group right" role="group">'
-            html += '<button id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            html += '<button type="button" id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
+                html += '<button class="btn btn-info right">Recommendations</button>'
+            html += '</div>'
+            html += '</div>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '</form>'
+            html += '</div>'
+            html += '<hr style="overflow: hidden; position: relative;">'
+            counter = counter + 1
+        html += '<div id="more" style="text-align:center">More</div>'
+        html += '</div>'
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
+    except noauthException:
+        return redirect(url_for('auth'))
+
+@app.route('/previousTracks')
+def previousTracks():
+    global prev_url
+    # return to previous URL if Tracks are disabled
+    if app.config["TRACKS"] == False:
+        return redirect(prev_url, code=302)
+    prev_url = '/previousTracks'
+    html = '<div class="col-lg-12 mx-auto">'
+    counter = 0
+    try:
+        tracks = spotifyapi.getRecentlyPlayed()
+        html += '<h3 id="songs_no" class="green card-title">Here are your '+str(len(tracks))+' recently played tracks</h3>'
+        html += '<hr>'
+        html += '<div class="col-lg-13 mx-auto">'
+        for track in tracks:
+            html += '<div>'
+            if app.config["RECOMMENDATIONS"] == True:
+                html += '<form action="/recommendations" method="get">'
+            html += '<div>'
+            artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
+            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
+            html += '<div class="btn-group right" role="group">'
+            html += '<button type="button" id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info right">Recommendations</button>'
@@ -232,9 +279,12 @@ def hideplaylists():
         playlists = spotifyapi.getAllPlaylists()
         for playlist in playlists:
             cover_path = coverImage(playlist[0])
+            html += '<div>'
+            html += '<form action="/playlisthandler_hide" method="POST">'
+            html += '<div>'
             html += '<img width="40" height="40" src="'+cover_path+'"/>'
-            html += '<a style="padding-left: 10px;" title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'&name='+playlist[1]+'">'+playlist[1]+'</a>'
-            html += '<p>Number of tracks in this playlist: '+str(playlist[2])+'</p>'
+            html += '<a style="overflow-wrap: break-word; display:inline; padding-left: 10px;" title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'&name='+playlist[1]+'">'+playlist[1]+'</a>'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">Number of tracks in this playlist: '+str(playlist[2])+'</p>'
 
             if playlist[0] in playlist_hidden:
                 btn_type = 'btn-success'
@@ -243,13 +293,16 @@ def hideplaylists():
                 btn_type = 'btn-info'
                 btn_msg = 'Hide playlist'
 
-            html += '<form action="/playlisthandler_hide" method="POST">'
-            html += '<button type="submit" class="btn '+str(btn_type)+' right">'+str(btn_msg)+'</button>'
             html += '<input type="hidden" name="playlist_id" value="'+playlist[0]+'">'
             html += '<input type="hidden" name="playlist_name" value="'+playlist[1]+'">'
             html += '<input type="hidden" name="playlist_total_tracks" value="'+str(playlist[2])+'">'
+            html += '<div class="btn-group right" role="group">'
+            html += '<button type="submit" class="btn '+str(btn_type)+' right">'+str(btn_msg)+'</button>'
+            html += '</div>'
+            html += '</div>'
             html += '</form>'
-            html += '<hr>'
+            html += '</div>'
+            html += '<hr style="overflow: hidden; position: relative;">'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))
@@ -280,7 +333,7 @@ def playlisthandler():
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
             html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
             html += '<div class="btn-group right" role="group">'
-            html += '<button id="'+str(counter)+'" class="btn btn-success" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            html += '<button type="button" id="'+str(counter)+'" class="btn btn-success" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<input type="hidden" name="song_id" value="'+str(track[2].split(':')[-1])+'"/>'
                 html += '<button class="btn btn-info">Recommendations</button>'
@@ -423,6 +476,8 @@ def config():
             html += '<button type="submit" class="btn btn-info">Toggle - Currently: '+str(status)+'</button>'
             html += '<input type="hidden" name="config_entry" value="'+cfg+'">'
             html += '</form>'
+        # Also add a link to /hideplaylists
+        html += '<h3><a href="/hideplaylists">Hideplaylists</a></h3'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))

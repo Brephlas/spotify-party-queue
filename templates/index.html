@@ -72,12 +72,12 @@
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <div id="logo" class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-          <p id="logo_img" class="sidebar-brand brand-logo" onclick="showpageload();window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /> Spotifyqueue</p>
-          <p id="logo_img_mini" class="sidebar-brand brand-logo-mini" onclick="showpageload();window.location.replace('/');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /></p>
+          <p id="logo_img" class="sidebar-brand brand-logo" onclick="showpageload();window.location.replace('/search');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /> Spotifyqueue</p>
+          <p id="logo_img_mini" class="sidebar-brand brand-logo-mini" onclick="showpageload();window.location.replace('/search');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /></p>
         </div>
         <ul class="nav">
           <li class="nav-item menu-items">
-            <a class="nav-link" href="/" onclick="showpageload()">
+            <a class="nav-link" href="/search" onclick="showpageload()">
               <span class="menu-icon">
                 <i class="mdi mdi-magnify"></i>
               </span>
@@ -91,6 +91,14 @@
                 <i class="mdi mdi-playlist-play"></i>
               </span>
               <span class="menu-title">Tracks</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="/previousTracks" onclick="showpageload()">
+              <span class="menu-icon">
+                <i class="mdi mdi-queue-first-in-last-out"></i>
+              </span>
+              <span class="menu-title">Previously played</span>
             </a>
           </li>
           {% endif %}
@@ -121,7 +129,7 @@
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar p-0 fixed-top d-flex flex-row">
           <div id="logo-mini-div" class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-            <img id="logo-mini" style="height:1em;" src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" onclick="showpageload();window.location.replace('/');" />
+            <img id="logo-mini" style="height:1em;" src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" onclick="showpageload();window.location.replace('/search');" />
           </div>
           <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
             <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
@@ -129,7 +137,7 @@
             </button>
             <ul class="navbar-nav w-100">
               <li class="nav-item w-100">
-                <form action="/" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search" method="get">
+                <form action="/search" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search" method="get">
                   <div class="input-group">
                     <input id="songname" type="text" autocomplete="off" class="keyboard form-control input" placeholder="Songname" name="q">
                     <input type="hidden" name="type" value="track"/>

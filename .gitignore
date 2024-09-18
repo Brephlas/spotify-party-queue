@@ -4,3 +4,4 @@ covers/*.jpg
 config.ini
 .devices
 .playlist_hidden
+.playlist_tracks.pkl

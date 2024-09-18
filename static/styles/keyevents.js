@@ -6,7 +6,7 @@ function eKeyUp(e){
    if(e.which == 13) {
       e.preventDefault();
       // submit search
-      $('#search-2').click();
+      $('#search-1').click();
    } else if(e.which == 8) {
       // backspace, so remove last character from search
       $('#songname').attr('value', $('#songname').val().slice(0,-1))

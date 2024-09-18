@@ -67,11 +67,12 @@ function addSong(element_id, id, access_token, song_name, img_path) {
     position: 'topCenter',
     transitionIn: 'flipInX',
     transitionOut: 'flipOutX',
+    color: '#2b3038',
     image: img_path,
-    progressBarColor: 'rgb(0, 255, 184)',
+    progressBarColor: '#66d469',
     imageWidth: 70,
     layout: 2,
-    iconColor: 'rgb(0, 255, 184)',
+    iconColor: '#66d469',
     timeout: timeout_target
   });
 }
@@ -152,7 +153,7 @@ let lastY = 0;
 // Trigger fetching of additional songs
 window.addEventListener('scroll', function(e) {
   // check if end was nearly reached (and function not already ran)
-  let triggerY = window.screen.height/5;
+  let triggerY = window.screen.height/4;
   if (Math.round(window.innerHeight + window.scrollY) >= document.body.scrollHeight - triggerY && (Math.abs(lastY - window.scrollY) > triggerY || lastY == 0) ) {
     // store last scroll value
     lastY = window.scrollY;
@@ -397,11 +398,11 @@ if(window.location.pathname.includes("playlists")) {
   search_input.focus();
 }
 
-// action when pressed enter
+// action when pressed enter/return to open playlist
 $('#search').on('keyup', eKeyUp);
 function eKeyUp(e){
-  // when enter was pressed inside input
-  if(e.which == 13) {    
+  // when enter/return was pressed inside input
+  if(e.which == 13) {
     // get all results
 	  var playlists = document.querySelectorAll(".search_listelement");
     // and if one element is left, click it

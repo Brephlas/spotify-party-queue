@@ -6,6 +6,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy.util as util
 from flask import redirect
 from noauthException import noauthException
+import pickle
+from pathlib import Path
 
 class spotifyapi:
     def __init__(self, client_id, client_secret, redirect_uri, port):
@@ -18,8 +20,10 @@ class spotifyapi:
         self.playlists = []
         self.tracks = [] # helper for storing saved tracks
         self.playlist_tracks = {} # helper for storing tracks of playlists
+        self.recent_tracks = [] # helper for storing recently played tracks
         self.play_next = []
         self.currently_playing = ''
+        self.loadOfflineStorage()
 
     def setHeader(self, token):
         self.header = {'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token}
@@ -41,7 +45,10 @@ class spotifyapi:
         return self.authenticated
 
     def getAccessToken(self):
-        return self.access_token
+        if self.access_token:
+            return self.access_token
+        else:
+            raise noauthException
 
     def sendRequest(self, url):
         r = requests.get(url, headers=self.header)
@@ -79,7 +86,7 @@ class spotifyapi:
 
     def authorize(self):
         #permissions = ['user-modify-playback-state', 'playlist-read-private', 'user-read-playback-state', 'user-library-read'] # without ability to modify playback
-        permissions = ['user-modify-playback-state', 'playlist-read-private', 'user-read-playback-state', 'user-library-read', 'user-library-modify'] # usage for e.g. save current song
+        permissions = ['user-modify-playback-state', 'playlist-read-private', 'user-read-playback-state', 'user-library-read', 'user-library-modify', 'user-read-recently-played'] # usage for e.g. save current song
         scope = '%20'.join(permissions)
         return redirect('https://accounts.spotify.com/authorize?client_id='+self.client_id+'&response_type=code&redirect_uri='+self.redirect_uri+':'+self.port+'/token&scope='+scope, code=302)
 
@@ -178,6 +185,55 @@ class spotifyapi:
                         break
                     counter = counter + 1
             return self.tracks
+        except KeyError:
+            raise noauthException
+
+    def getRecentlyPlayed(self, songs_dynamic_loading = True):
+        counter = 0
+        try:
+            if self.recent_tracks:
+                data = self.sendRequest('https://api.spotify.com/v1/me/player/recently-played?limit=1')
+                for track in data['items']:
+                    uri = track['track']['uri']
+                if uri == self.recent_tracks[0][2]:
+                    # if the first local stored song matches with the api's first stored song
+                    # there was no change made and we can use the local list
+                    return self.recent_tracks
+                else:
+                    tmp_list = []
+                    for i in range(5):
+                        offset = i * 5
+                        data = self.sendRequest('https://api.spotify.com/v1/me/player/recently-played?limit=5&offset='+str(offset))
+                        for track in data['items']:
+                            uri = track['track']['uri']
+                            if uri == self.recent_tracks[0][2]:
+                                tmp_to_extend = self.recent_tracks
+                                tmp_list.extend(tmp_to_extend)
+                                self.recent_tracks = tmp_list
+                                return self.recent_tracks
+                            else:
+                                artist = track['track']['artists'][0]['name']
+                                song = track['track']['name']
+                                uri = track['track']['uri']
+                                cover_url = track['track']['album']['images'][0]['url']
+                                tmp_list.append((artist, song, uri, cover_url))
+
+            # no tracks are stored
+            self.recent_tracks = []
+
+            # load 50 of the last played tracks
+            data = self.sendRequest('https://api.spotify.com/v1/me/player/recently-played?limit=50')
+        
+            for track in data['items']:
+                artist = track['track']['artists'][0]['name']
+                song = track['track']['name']
+                uri = track['track']['uri']
+                cover_url = track['track']['album']['images'][0]['url']
+                self.recent_tracks.append((artist, song, uri, cover_url))
+            if not data['items']:
+                # break out of loop as all songs are collected
+                return []
+            return self.recent_tracks
         except KeyError:
             raise noauthException
 
@@ -331,6 +387,8 @@ class spotifyapi:
                         break
                     counter = counter + 1
                 self.playlist_tracks[playlist_id].reverse()
+            # store songs for peristence after restart before returning
+            self.storeOfflineStorage()
             return self.playlist_tracks[playlist_id]
         except noauthException:
             raise noauthException
@@ -485,3 +543,14 @@ class spotifyapi:
         d = {'device_ids': device_ids}
         body_params = json.dumps(d)
         requests.put('https://api.spotify.com/v1/me/player', headers=self.header, data=body_params)
+
+    def storeOfflineStorage(self):
+        with open('.playlist_tracks.pkl', 'wb') as f:
+            pickle.dump(self.playlist_tracks, f)
+
+    def loadOfflineStorage(self):
+        playlist_storage_file = Path(".playlist_tracks.pkl")
+        file_size = playlist_storage_file.stat().st_size
+        if playlist_storage_file.is_file() and file_size > 0:
+            with open(playlist_storage_file, 'rb') as f:
+                self.playlist_tracks = pickle.load(f)
