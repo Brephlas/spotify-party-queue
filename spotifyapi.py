@@ -310,25 +310,34 @@ class spotifyapi:
         return allPlaylists
 
     def getCoverImage(self, playlist_id):
-        data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/images')
-        if data:
-            return data[0]['url']
-        else:
-            return ''
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id+'/images')
+            if data:
+                return data[0]['url']
+            else:
+                return ''
+        except KeyError:
+            raise noauthException
         
     def getPlaylistName(self, playlist_id):
-        data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id)
-        if data:
-            return data['name']
-        else:
-            return ''
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id)
+            if data:
+                return data['name']
+            else:
+                return ''
+        except KeyError:
+            raise noauthException
         
     def getPlaylistNoSongs(self, playlist_id):
-        data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id)
-        if data:
-            return int(data['tracks']['total'])
-        else:
-            return 0
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/playlists/'+playlist_id)
+            if data:
+                return int(data['tracks']['total'])
+            else:
+                return 0
+        except KeyError:
+            raise noauthException
 
     def getPlaylistTracks(self, playlist_id, playlists_dynamic_loading = False):
         if playlist_id in self.playlist_tracks:
@@ -408,6 +417,14 @@ class spotifyapi:
             return current_song
         except:
             return 'Nothing playing right now'
+
+    def getCurrentlyPlayingID(self):
+        try:
+            data = self.sendRequest('https://api.spotify.com/v1/me/player/currently-playing')
+            song_id = data['item']['id']
+            return song_id
+        except:
+            return 0
 
     def addNextSong(self, name):
         if name not in self.play_next:
@@ -554,3 +571,12 @@ class spotifyapi:
         if playlist_storage_file.is_file() and file_size > 0:
             with open(playlist_storage_file, 'rb') as f:
                 self.playlist_tracks = pickle.load(f)
+
+    def buttonControlSaveSong(self):
+        current_song_id = self.getCurrentlyPlayingID()
+        if current_song_id != 0:
+            data = self.sendRequest('https://api.spotify.com/v1/me/tracks/contains?ids='+current_song_id)
+            return 'disabled' if data[0] else ''
+        else:
+            # no song is playing
+            return 'disabled'

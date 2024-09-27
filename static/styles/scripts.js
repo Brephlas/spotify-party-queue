@@ -34,9 +34,16 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   Http.setRequestHeader('Accept', 'application/json');
   Http.setRequestHeader('Content-Type', 'application/json');
   Http.setRequestHeader('Authorization', 'Bearer '+access_token);
+
+  Http.onreadystatechange= function() {
+    if(Http.status == 401) {
+      // unauthorized
+      updateAccessToken();
+      addSong(element_id, id, access_token, song_name, img_path);
+  }
   Http.send();
 
-  if(REMOVE_ELEMENTS == true) {
+  if(REMOVE_ELEMENTS == true && !window.location.pathname.includes("previousTracks")) {
     // play fade out animation when elements are removed
     fadeOutAnimation(button);
   } else {
@@ -53,18 +60,20 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   // different timeout settings for smaller screens
   if(window.screen.width <= 980) {
 	  timeout_target = 1500;
+    dyn_position = 'bottomCenter';
   } else {
 	  timeout_target = 3000;
+    dyn_position = 'topCenter';
   }
 
   // show notification
   iziToast.show({
     theme: 'dark',
     icon: 'icon-contacts',
-    title: decodeURI(song_name.replaceAll('+', ' ')),
+    title: decodeURI(song_name.replaceAll('+', ' ')).replaceAll("%27", "'"),
     message: ' added to queue',
     displayMode: 2,
-    position: 'topCenter',
+    position: dyn_position,
     transitionIn: 'flipInX',
     transitionOut: 'flipOutX',
     color: '#2b3038',
@@ -148,6 +157,167 @@ function toggleSidebar() {
   }
 }
 
+// save current song
+function saveCurrentSong() {
+  if(PRIVATE == true) {
+    return;
+  }
+  var url_current_playing = "https://api.spotify.com/v1/me/player/currently-playing";
+  var url_save_song = "https://api.spotify.com/v1/me/tracks/?ids=";
+
+  var Http = new XMLHttpRequest();
+  Http.responseType = 'json';
+  Http.open("GET", url_current_playing);
+  Http.setRequestHeader('Accept', 'application/json');
+  Http.setRequestHeader('Content-Type', 'application/json');
+  Http.setRequestHeader('Authorization', 'Bearer '+access_token);
+
+  // get result of each request and fill variables
+  Http.onreadystatechange= function() {
+    var result = Http.response;
+    if(Http.status == 401) {
+      updateAccessToken();
+      saveCurrentSong();
+    }
+    if(!result) return;
+    var song = result['item'];
+    var id = song['uri'].split(':').at(-1);
+    
+    var Http_saveSong = new XMLHttpRequest();
+    Http_saveSong.responseType = 'json';
+    Http_saveSong.open("PUT", url_save_song+id);
+    Http_saveSong.setRequestHeader('Accept', 'application/json');
+    Http_saveSong.setRequestHeader('Content-Type', 'application/json');
+    Http_saveSong.setRequestHeader('Authorization', 'Bearer '+access_token);
+
+    Http_saveSong.onreadystatechange = function() {
+      // show indication of success
+      if(Http_saveSong.status == 200) {
+        // update button text and disable it
+        $('#save-song-button').text('Saved');
+        $('#save-song-button').prop("disabled", true);
+      }
+    }
+    Http_saveSong.send();
+  };
+  Http.send();
+}
+
+// update song button based on current song
+function updateSaveButton() {
+  var url_current_playing = "https://api.spotify.com/v1/me/player/currently-playing";
+  var url_contains = "https://api.spotify.com/v1/me/tracks/contains?ids=";
+
+  var Http = new XMLHttpRequest();
+  Http.responseType = 'json';
+  Http.open("GET", url_current_playing);
+  Http.setRequestHeader('Accept', 'application/json');
+  Http.setRequestHeader('Content-Type', 'application/json');
+  Http.setRequestHeader('Authorization', 'Bearer '+access_token);
+
+  // get result of each request and fill variables
+  Http.onreadystatechange= function() {
+    var result = Http.response;
+    if(Http.status == 401) {
+      // unauthorized
+      updateAccessToken();
+      updateSaveButton();
+    }
+    if(!result) {
+      // no playback
+      $('#save-song-button').text('no playback');
+      $('#save-song-button').prop("disabled", true);
+      return;
+    } 
+    var song = result['item'];
+    var id = song['uri'].split(':').at(-1);
+    
+    var http_songAlreadySaved = new XMLHttpRequest();
+    http_songAlreadySaved.responseType = 'json';
+    http_songAlreadySaved.open("GET", url_contains+id);
+    http_songAlreadySaved.setRequestHeader('Accept', 'application/json');
+    http_songAlreadySaved.setRequestHeader('Content-Type', 'application/json');
+    http_songAlreadySaved.setRequestHeader('Authorization', 'Bearer '+access_token);
+
+    http_songAlreadySaved.onreadystatechange = function() {
+      var api_response = http_songAlreadySaved.response;
+      if (Array.isArray(api_response)) {
+        var saved = api_response[0];
+        // show indication of success
+        if(saved) {
+          // song is saved in library so
+          // update button text and disable it
+          $('#save-song-button').text('Saved');
+          $('#save-song-button').prop("disabled", true);
+        } else {
+          // song is not saved so
+          // activate button back again (in case it isn't)
+          $('#save-song-button').text('Save Song');
+          $('#save-song-button').prop("disabled", false);
+        }
+      }
+    }
+    http_songAlreadySaved.send();
+  };
+  Http.send();
+}
+
+// update token
+function updateAccessToken() {
+  fetch('/get-token')
+    .then(response => response.text())
+    .then(data => {
+        const authToken = data;
+        access_token = authToken;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// request recently played API to check if it has a new track
+function recentlyPlayedUpdate(msg, interval = 5000, maxAttempts = 10) {
+  var url = "https://api.spotify.com/v1/me/player/recently-played?limit=1";
+  let attempts = 0;
+
+  function makeRequest() {
+    var Http = new XMLHttpRequest();
+    Http.responseType = 'json';
+    Http.open("GET", url);
+    Http.setRequestHeader('Accept', 'application/json');
+    Http.setRequestHeader('Content-Type', 'application/json');
+    Http.setRequestHeader('Authorization', 'Bearer '+access_token);
+
+    // get result of each request and fill variables
+    Http.onreadystatechange= function(e) {
+      var result = Http.response;
+      if(Http.status == 401) {
+        updateAccessToken();
+        recentlyPlayedUpdate();
+      }
+      if(!result) return;
+      var items = result['items'];
+      if(items.length) {
+        items.forEach((song) => {
+          var song_artist = song['track']['artists'][0]['name'] + ' - ' + song['track']['name'];
+          var song_name = song['track']['name'];
+          if(song_artist == msg || song_name == msg) {
+            location.reload();
+            return;
+          }
+        }
+      )}
+      
+      attempts++;
+      if (attempts < maxAttempts) {
+        // Versuche erneut nach der gegebenen Zeitspanne
+        setTimeout(makeRequest, interval);
+      }
+    };
+    Http.send();
+  }
+
+  setTimeout(makeRequest, 5000);
+}
+
 let lastY = 0;
 // Scroll to the bottom of the page
 // Trigger fetching of additional songs
@@ -220,7 +390,7 @@ window.addEventListener('scroll', function(e) {
           html += '<img class="fading-newelems'+offset+'" style="opacity:.0; width="40" height="40" src="'+cover_url+'" ondblclick="addSong('+counter+', \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')" />'
           html += '<p class="fading-newelems'+offset+'" style="opacity:.0; overflow-wrap: break-word; display:inline; padding-left: 10px;">'+name+'</p>'
           html += '<div class="btn-group right" role="group">'
-          html += '<button id="'+counter+'" class="btn btn-success right fading-buttons'+offset+'" style="opacity:.0; onclick="addSong(this.id, \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')">Add to queue</button>'
+          html += '<button type="button" id="'+counter+'" class="btn btn-success right fading-buttons'+offset+'" style="opacity:.0;" onclick="addSong(this.id, \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')">Add to queue</button>'
           if (RECOMMENDATIONS) {
             html += '<input type="hidden" name="song_id" value="'+uri.split(':').at(-1)+'"/>'
             html += '<button style="opacity:.0;" class="btn btn-info right fading-buttons'+offset+'">Recommendations</button>'
@@ -330,7 +500,7 @@ if(SOCKET == true) {
   socket.on( 'connect', function() {
     socket.emit( 'updatesong', {} )
   } )
-  socket.on( 'updatesong_response', function( msg ) {
+  socket.on( 'updatesong_response', async function( msg ) {
     // update icon as indicator for playback
     var icon = document.querySelector('img[alt="logo"]');
     if(msg == 'Nothing playing right now') {
@@ -341,12 +511,25 @@ if(SOCKET == true) {
         reloadImg(icon.src);
       }
     } else {
-	    // green icon because music is playing
+	    // set green icon because music is playing
       if(!icon.src.includes('/static/assets/img/menuicon_green.png')) {
         icon.src = '/static/assets/img/menuicon_green.png';
         // update cache
         reloadImg(icon.src);
       }
+
+      if($('#current').text() != msg) {
+        // check again if new song is already saved
+        updateSaveButton();
+
+        // reload website when currently on previously played tracks
+        if(window.location.pathname.includes("previousTracks")) {
+          // reload after a delay to allow spotify to update the most recent song
+          recentlyPlayedUpdate($('#current').text());
+          //setTimeout(() => location.reload(), 5000);
+        }
+      }
+
     }
 
     $('#current').text(msg)
@@ -395,6 +578,12 @@ window.onload = function fading() {
 // place cursor in search field for playlists
 if(window.location.pathname.includes("playlists")) {
 	var search_input = document.querySelector('#search');
+  search_input.focus();
+}
+
+// place cursor in search field for general search
+if(window.location.pathname.includes("search")) {
+	var search_input = document.querySelector('#songname');
   search_input.focus();
 }
 

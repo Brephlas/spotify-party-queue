@@ -29,50 +29,39 @@
     <script src="{{ url_for('static',filename='styles/iziToast.min.js') }}"></script>
   </head>
   <body class="sidebar-icon-only">
+    <script>
     {% if config["SOCKET"] == True %}
-        <script>
-            var SOCKET = true;
-        </script>
+      var SOCKET = true;
     {% else %}
-        <script>
-            var SOCKET = false;
-        </script>
+      var SOCKET = false;
+    {% endif %}
+    {% if config["PRIVATE"] == True %}
+      var PRIVATE = true;
+    {% else %}
+            var PRIVATE = false;
     {% endif %}
     {% if config["REMOVE_ELEMENTS"] == True %}
-        <script>
-            var REMOVE_ELEMENTS = true;
-        </script>
+      var REMOVE_ELEMENTS = true;
     {% else %}
-        <script>
-            var REMOVE_ELEMENTS = false;
-        </script>
+      var REMOVE_ELEMENTS = false;
     {% endif %}
     {% if config["RECOMMENDATIONS"] == True %}
-        <script>
-            var RECOMMENDATIONS = true;
-        </script>
+      var RECOMMENDATIONS = true;
     {% else %}
-        <script>
-            var RECOMMENDATIONS = false;
-        </script>
+      var RECOMMENDATIONS = false;
     {% endif %}
     {% if config["PLAYLISTS_DYNAMIC_LOADING"] == True %}
-        <script>
-            var PLAYLISTS_DYNAMIC_LOADING = true;
-        </script>
+      var PLAYLISTS_DYNAMIC_LOADING = true;
     {% else %}
-        <script>
-            var PLAYLISTS_DYNAMIC_LOADING = false;
-        </script>
+      var PLAYLISTS_DYNAMIC_LOADING = false;
     {% endif %}
-    <script>
-        var access_token = "{{ access_token | safe }}";
+      var access_token = "{{ access_token | safe }}";
     </script>
     <div class="container-scroller">
       <!-- partial:partials/_sidebar.html -->
-      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <nav class="sidebar sidebar-offcanvas" id="sidebar" style="display: grid;">
         <div id="logo" class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-          <p id="logo_img" class="sidebar-brand brand-logo" onclick="showpageload();window.location.replace('/search');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /> Spotifyqueue</p>
+          <!--<p id="logo_img" class="sidebar-brand brand-logo" onclick="showpageload();window.location.replace('/search');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /> Spotifyqueue</p>-->
           <p id="logo_img_mini" class="sidebar-brand brand-logo-mini" onclick="showpageload();window.location.replace('/search');"><img src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" /></p>
         </div>
         <ul class="nav">
@@ -123,6 +112,9 @@
           </li>
           {% endif %}
         </ul>
+        <span class="menu-icon" style="margin-top: auto; position: fixed; bottom: 0;">
+          <a style="font-size: 1.6em;" href="https://github.com/Brephlas/spotify-party-queue" target="_blank" class="mdi mdi-github"></a>
+        </span>
       </nav>
       <!-- partial -->
       <div class="container-fluid page-body-wrapper">
@@ -156,9 +148,7 @@
               {% if config["PRIVATE"] == True %}
               <!-- Save current song button-->
               <li class="mt-2 mt-md-0 d-none d-sm-flex">
-                <form action="/save-current" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search" method="post">
-                  <button id="save-song-button" type="submit" class="btn btn-info">Save Song</button>
-                </form>
+                <button id="save-song-button" type="button" class="btn btn-info" onclick="saveCurrentSong();">Save Song</button>
               </li>
               {% endif %}
 
@@ -174,9 +164,9 @@
           </div>
         </nav>
         <!-- partial -->
-        <div class="main-panel">
+        <div class="main-panel" style="height:100%;">
           <!-- partial -->
-          <div id="content" class="content-wrapper">
+          <div style="display: grid;" id="content" class="content-wrapper">
             {{ style_start | safe }}
               {{ searchbox | safe }}
                 <!-- Content -->
