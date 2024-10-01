@@ -126,7 +126,7 @@ def search():
     if not q:
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     else:
-        prev_url = '/?q='+str(q)+'&type='+str(t)
+        prev_url = '/search?q='+str(q)+'&type='+str(t)
         html += '<h3>Search results for '+str(q)+'</h3>'
         html += '<hr>'
         try:
@@ -136,13 +136,16 @@ def search():
             result = spotifyapi.search(q, t)
             counter = 0
             for track in result:
+                artist = track[0]
+                song_name = track[1]
+                artist_id = track[4]
                 html += '<div>'
                 if app.config["RECOMMENDATIONS"] == True:
                     html += '<form action="/recommendations" method="get">'
                 html += '<div style="opacity:.0;" class="fading">'
-                artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
+                artist_track = urllib.parse.quote_plus((artist+' - '+song_name).encode('utf-8'))
                 html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
-                html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
+                html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;"><a href="/artists?artist='+artist_id+'">'+artist+'</a> - '+song_name+'</p>'
                 html += '<div class="btn-group right" role="group">'
                 html += '<button type="button" id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
                 if app.config["RECOMMENDATIONS"] == True:
@@ -176,13 +179,16 @@ def tracks():
         html += '<hr>'
         html += '<div class="col-lg-13 mx-auto">'
         for track in tracks:
+            artist = track[0]
+            song_name = track[1]
+            artist_id = track[4]
             html += '<div>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<form action="/recommendations" method="get">'
             html += '<div>'
-            artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
+            artist_track = urllib.parse.quote_plus((artist+' - '+song_name).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
-            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;"><a href="/artists?artist='+artist_id+'">'+artist+'</a> - '+song_name+'</p>'
             html += '<div class="btn-group right" role="group">'
             html += '<button type="button" id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
             if app.config["RECOMMENDATIONS"] == True:
@@ -216,13 +222,16 @@ def previousTracks():
         html += '<hr>'
         html += '<div class="col-lg-13 mx-auto">'
         for track in tracks:
+            artist = track[0]
+            song_name = track[1]
+            artist_id = track[4]
             html += '<div>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<form action="/recommendations" method="get">'
             html += '<div>'
-            artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
+            artist_track = urllib.parse.quote_plus((artist+' - '+song_name).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
-            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;"><a href="/artists?artist='+artist_id+'">'+artist+'</a> - '+song_name+'</p>'
             html += '<div class="btn-group right" role="group">'
             html += '<button type="button" id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
             if app.config["RECOMMENDATIONS"] == True:
@@ -257,11 +266,11 @@ def playlists():
         html += '<div class="row">'
         for playlist in playlists:
             cover_path = coverImage(playlist[0])
-            html += '<div class="col-sm-2 grid-margin">'
+            html += '<div class="col-6 col-md-2 grid-margin">'
             html += '<div class="card">'
             html += '<div class="card-body">'
             html += '<p class="playlistname">'+str(playlist[1])+'</p>'
-            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+str(playlist[0])+'" onclick="loading(\''+spotifyapi.getAccessToken()+'\')"><img class="responsive" src="'+cover_path+'"/></a>'
+            html += '<a title="'+playlist[1]+'" href="/playlisthandler?playlist='+str(playlist[0])+'" onclick="showpageload(\''+spotifyapi.getAccessToken()+'\')"><img class="responsive" src="'+cover_path+'"/></a>'
             html += '</div>'
             html += '</div>'
             html += '</div>'
@@ -339,13 +348,16 @@ def playlisthandler():
         html += '<div class="col-lg-13 mx-auto">'
         counter = 0
         for track in tracks:
+            artist = str(track[0])
+            song_name = str(track[1])
+            artist_id = str(track[4])
             html += '<div>'
             if app.config["RECOMMENDATIONS"] == True:
                 html += '<form action="/recommendations" method="get">'
             html += '<div style="opacity:.0;" class="fading">'
-            artist_track = urllib.parse.quote_plus((track[0]+' - '+track[1]).encode('utf-8'))
+            artist_track = urllib.parse.quote_plus((artist+' - '+song_name).encode('utf-8'))
             html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
-            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+track[0]+' - '+track[1]+'</p>'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;"><a href="/artists?artist='+artist_id+'">'+artist+'</a> - '+song_name+'</p>'
             html += '<div class="btn-group right" role="group">'
             html += '<button type="button" id="'+str(counter)+'" class="btn btn-success" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
             if app.config["RECOMMENDATIONS"] == True:
@@ -446,6 +458,135 @@ def recommendations():
         html += '</div>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
+        return redirect(url_for('auth'))
+
+
+@app.route('/artists')
+def artists():
+    global prev_url
+    artist_id = request.args.get('artist')
+    prev_url = '/artists?artist='+str(artist_id)
+    html = '<div class="col-lg-12 mx-auto">'
+    counter = 0
+    try:
+        # Header for artist
+        artist = spotifyapi.getArtist(artist_id)
+        artist_name = artist[0]
+        genres = (', '.join(artist[1])).title()
+        followers = "{:,d}".format(artist[2])
+        cover_url = artist[3]
+        # (name, genre, followers, cover_url)
+        ## widescreen version
+        html += '<div style="display: grid;" class="d-none d-md-none d-sm-none d-lg-block d-xl-block">'
+        html += '<div style="overflow: auto;">'
+        html += '<img class="left" width="100" height="100" src="'+cover_url+'" style="margin-right: 10px;"/>'
+        html += '<div style="overflow-wrap: break-word; display: inline;" class="artist-img">'
+        html += '<h3 style="overflow-wrap: break-word; display: inline; color: #65955b" id="songs_no" class="green card-title artist-title">'+artist_name+'</h3>'
+        if genres:
+            html += '<a style="overflow-wrap: break-word; display: inline;" class="artist-title">Genres: '+genres+'</a>'
+        html += '<p style="overflow-wrap: break-word; display: inline;" class="artist-title">Follower: '+followers+'</p>'
+        html += '</div>'
+        html += '</div>'
+        html += '<hr>'
+        html += '</div>' # div for block view on mobile screens
+        ## mobile version
+        html += '<div style="display: grid;" class="d-md-block d-sm-block d-lg-none d-xl-none">'
+        html += '<div style="overflow: auto;">'
+        html += '<img class="left" width="100" height="100" src="'+cover_url+'" style="margin-right: 10px;"/>'
+        html += '<div style="overflow-wrap: break-word; display: inline;" class="artist-img">'
+        html += '<h3 style="overflow-wrap: break-word; display: inline; color: #65955b" id="songs_no" class="green card-title artist-title">'+artist_name+'</h3>'
+        html += '<br>'
+        if genres:
+            html += '<a style="overflow-wrap: break-word; display: inline;" class="artist-title">Genres: '+genres+'</a>'
+            html += '<br>'
+        html += '<p style="overflow-wrap: break-word; display: inline;" class="artist-title">Follower: '+followers+'</p>'
+        html += '<br>'
+        html += '<hr>'
+        html += '</div>'
+        html += '</div>'
+        html += '</div>' # div for block view on large screens
+
+        # List top songs    
+        top_tracks = spotifyapi.getArtistTopTracks(artist_id)
+        html += '<div class="col-lg-13 mx-auto">'
+        for track in top_tracks:
+            artist = track[0]
+            song_name = track[1]
+            html += '<div>'
+            html += '<div>'
+            artist_track = urllib.parse.quote_plus((artist+' - '+song_name).encode('utf-8'))
+            html += '<img width="40" height="40" src="'+track[3]+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+artist+' - '+song_name+'</p>'
+            html += '<div class="btn-group right" role="group">'
+            html += '<button type="button" id="'+str(counter)+'" class="btn btn-success right" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            html += '</div>'
+            html += '</div>'
+            html += '</div>'
+            html += '<hr style="overflow: hidden; position: relative;">'
+            counter = counter + 1
+
+        # List albums of artist
+        html += '<div style="overflow-x: hidden;">'
+        html += '<div style="text-align: center;">'
+        html += '<h3 style="overflow-wrap: break-word; display: inline; color: #65955b;" id="songs_no" class="green card-title">Albums</h3>'
+        html += '</div>'
+        html += '<hr>'
+        albums = spotifyapi.getArtistAlbums(artist_id)
+        html += '<input type="text" id="search" class="border form-control input" onkeyup="search()" placeholder="Search for playlist.." title="Type in a playlist name">'
+        html += '<div class="row">'
+        for album in albums:
+            # (album['id'], album['name'], album['images']['url'])
+            album_id = album[0]
+            album_name = album[1]
+            album_cover = album[2]
+            html += '<div class="col-sm-2 grid-margin">'
+            html += '<div class="card">'
+            html += '<div class="card-body">'
+            html += '<p class="playlistname">'+album_name+'</p>'
+            html += '<a title="'+album_name+'" href="/albumhandler?album='+album_id+'" onclick="showpageload(\''+spotifyapi.getAccessToken()+'\')"><img class="responsive" src="'+album_cover+'"/></a>'
+            html += '</div>'
+            html += '</div>'
+            html += '</div>'
+        html += '</div>'
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
+    except noauthException:
+        return redirect(url_for('auth'))
+
+@app.route('/albumhandler')
+def albumhandler():
+    global prev_url
+    album_id = request.args.get('album')
+    prev_url='/albumhandler?album='+str(album_id)
+    try:
+        (album_name, cover_url) = spotifyapi.getAlbumNameAndCoverURL(album_id)
+        html = ''
+        tracks = spotifyapi.getAlbumTracks(album_id)
+        # (artist, song, uri, artist_id)
+        html += '<p style="overflow-wrap: break-word; display:inline;"><h4>'+str(album_name)+'</h4></p>'
+        html += '<p id="songs_no">Number of tracks in this album: '+str(len(tracks))+'</p>'
+        html += '<hr>'
+        html += '<div class="col-lg-13 mx-auto">'
+        counter = 0
+        for track in tracks:
+            artist = track[0]
+            song_name = track[1]
+            artist_id = track[3]
+            html += '<div>'
+            html += '<div style="opacity:.0;" class="fading">'
+            artist_track = urllib.parse.quote_plus((artist+' - '+song_name).encode('utf-8'))
+            html += '<img width="40" height="40" src="'+cover_url+'" ondblclick="addSong('+str(counter)+', \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')" />'
+            html += '<p style="overflow-wrap: break-word; display:inline; padding-left: 10px;">'+artist+' - '+song_name+'</p>'
+            html += '<div class="btn-group right" role="group">'
+            html += '<button type="button" id="'+str(counter)+'" class="btn btn-success" onclick="addSong(this.id, \''+track[2]+'\', \''+spotifyapi.getAccessToken()+'\', \''+artist_track+'\', \''+track[3]+'\')">Add to queue</button>'
+            html += '</div>'
+            html += '</div>'
+            html += '</div>'
+            html += '<hr style="overflow: hidden; position: relative;">'
+            counter = counter + 1
+
+        html += '</div>'
+        return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
+    except noauthException as e:
         return redirect(url_for('auth'))
 
 @app.route('/config', methods=['GET', 'POST'])

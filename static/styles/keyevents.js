@@ -3,10 +3,11 @@ $('body').on('keyup', eKeyUp);
 $('#songname').on('keyup', eKeyUpINPUT);
 
 function eKeyUp(e){
-   if(e.which == 13) {
+   if(e.which == 13 && !window.location.pathname.includes("playlists")) {
       e.preventDefault();
       // submit search
       $('#search-1').click();
+      $('#search-2').click();
    } else if(e.which == 8) {
       // backspace, so remove last character from search
       $('#songname').attr('value', $('#songname').val().slice(0,-1))

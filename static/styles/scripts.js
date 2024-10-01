@@ -40,6 +40,7 @@ function addSong(element_id, id, access_token, song_name, img_path) {
       // unauthorized
       updateAccessToken();
       addSong(element_id, id, access_token, song_name, img_path);
+    }
   }
   Http.send();
 
@@ -381,6 +382,10 @@ window.addEventListener('scroll', function(e) {
           var name = song['track']['artists'][0]['name'] + ' - ' + song['track']['name'];
           var uri = song['track']['uri'];
           var cover_url = song['track']['album']['images'][0]['url'];
+          var cover_url = song['track']['album']['images'][0]['url'];
+          var artist_id = song['track']['artists'][0]['id'];
+          var artist = song['track']['artists'][0]['name'];
+          var song_name = song['track']['name'];
 
           // generate HTML elements for each song
           html += '<div>'
@@ -388,7 +393,8 @@ window.addEventListener('scroll', function(e) {
               html += '<form action="/recommendations" method="get">'
           html += '<div>'
           html += '<img class="fading-newelems'+offset+'" style="opacity:.0; width="40" height="40" src="'+cover_url+'" ondblclick="addSong('+counter+', \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')" />'
-          html += '<p class="fading-newelems'+offset+'" style="opacity:.0; overflow-wrap: break-word; display:inline; padding-left: 10px;">'+name+'</p>'
+          html += '<p class="fading-newelems'+offset+'" style="opacity:.0; overflow-wrap: break-word; display:inline; padding-left: 10px;"><a href="/artists?artist='+artist_id+'">'+artist+'</a> - '+song_name+'</p>'
+
           html += '<div class="btn-group right" role="group">'
           html += '<button type="button" id="'+counter+'" class="btn btn-success right fading-buttons'+offset+'" style="opacity:.0;" onclick="addSong(this.id, \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')">Add to queue</button>'
           if (RECOMMENDATIONS) {
@@ -623,18 +629,41 @@ $(document).on("click", function (event)
   }
 });
 
-// drag listener
-var divOverlay = document.getElementById ("#content");
-var dragged = false
+// drag listener for history forward/back method
+var divOverlay = document.getElementById("#content");
+var dragged = false;
 var oldX = 0;
-window.addEventListener('mousedown', function (e) { oldX = e.pageX; dragged = false });
-document.addEventListener('mousemove', function () { dragged = true });
+var clickTimeout;
+var clickCount = 0;
+
+window.addEventListener('mousedown', function(e) { 
+    oldX = e.pageX; 
+    dragged = false; 
+});
+
+document.addEventListener('mousemove', function() { 
+    dragged = true; 
+});
+
 window.addEventListener('mouseup', function(e) {
-  if (Math.abs((e.pageX - oldX)) > 100 ) {
-    if (dragged == true && e.pageX < oldX) {
-      history.forward();
-    } else if (dragged == true && e.pageX > oldX) {
-      history.back();
+    clickCount++;
+
+    // abort if timeout is still running
+    if (clickTimeout) {
+        clearTimeout(clickTimeout);
+        clickTimeout = null;
     }
-  }   
+
+    clickTimeout = setTimeout(function() {
+      // only change history if it was a single click
+      if (clickCount === 1 && Math.abs(e.pageX - oldX) > 100) {
+        if (dragged == true && e.pageX < oldX) {
+          history.forward();
+        } else if (dragged == true && e.pageX > oldX) {
+          history.back();
+        }
+      }
+      clickCount = 0;
+      clickTimeout = null;
+    }, 500);
 });
