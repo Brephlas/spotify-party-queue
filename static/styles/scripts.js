@@ -44,7 +44,10 @@ function addSong(element_id, id, access_token, song_name, img_path) {
   }
   Http.send();
 
-  if(REMOVE_ELEMENTS == true && !window.location.pathname.includes("previousTracks")) {
+  if(REMOVE_ELEMENTS == true && !window.location.pathname.includes("previousTracks") 
+   && !window.location.pathname.includes("artists")
+   && !window.location.pathname.includes("albumhandler")
+  ) {
     // play fade out animation when elements are removed
     fadeOutAnimation(button);
   } else {
@@ -160,11 +163,11 @@ function toggleSidebar() {
 
 // save current song
 function saveCurrentSong() {
-  if(PRIVATE == true) {
+  if(PRIVATE == false) {
     return;
   }
   var url_current_playing = "https://api.spotify.com/v1/me/player/currently-playing";
-  var url_save_song = "https://api.spotify.com/v1/me/tracks/?ids=";
+  var url_save_song = "https://api.spotify.com/v1/me/tracks?ids=";
 
   var Http = new XMLHttpRequest();
   Http.responseType = 'json';
