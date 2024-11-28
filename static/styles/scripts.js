@@ -396,7 +396,7 @@ window.addEventListener('scroll', function(e) {
               html += '<form action="/recommendations" method="get">'
           html += '<div>'
           html += '<img class="fading-newelems'+offset+'" style="opacity:.0; width="40" height="40" src="'+cover_url+'" ondblclick="addSong('+counter+', \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')" />'
-          html += '<p class="fading-newelems'+offset+'" style="opacity:.0; overflow-wrap: break-word; display:inline; padding-left: 10px;"><a href="/artists?artist='+artist_id+'">'+artist+'</a> - '+song_name+'</p>'
+          html += '<p class="fading-newelems'+offset+'" style="opacity:.0; overflow-wrap: break-word; display:inline; padding-left: 10px; color: white;"><a href="/artists?artist='+artist_id+'">'+artist+'</a> - '+song_name+'</p>'
 
           html += '<div class="btn-group right" role="group">'
           html += '<button type="button" id="'+counter+'" class="btn btn-success right fading-buttons'+offset+'" style="opacity:.0;" onclick="addSong(this.id, \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')">Add to queue</button>'

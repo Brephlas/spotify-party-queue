@@ -5,3 +5,5 @@ config.ini
 .devices
 .playlist_hidden
 .playlist_tracks.pkl
+playlist_hiding/*
+!playlist_hiding/.gitkeep

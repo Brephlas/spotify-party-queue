@@ -9,6 +9,8 @@ import urllib
 import configparser
 import redis
 import urllib.parse
+import shutil
+from pathlib import Path
 from copy import copy
 
 app = Flask(__name__)
@@ -127,7 +129,7 @@ def search():
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     else:
         prev_url = '/search?q='+str(q)+'&type='+str(t)
-        html += '<h3>Search results for '+str(q)+'</h3>'
+        html += '<h3 style="color: white;">Search results for '+str(q)+'</h3>'
         html += '<hr>'
         try:
             # error handling
@@ -279,7 +281,7 @@ def playlists():
     except noauthException:
         return redirect(url_for('auth'))
 
-@app.route('/hideplaylists')
+@app.route('/hideplaylists', methods=['GET', 'POST'])
 def hideplaylists():
     global prev_url
     # return to previous URL if playlists are disabled
@@ -287,9 +289,15 @@ def hideplaylists():
         return redirect(prev_url, code=302)
     name = request.args.get('name')
     prev_url='/hideplaylists'
-    html = '<h4>Hide playlists</h4>'
+    html = '<h4 style="color: white;">Hide playlists</h4>'
     html += '<hr>'
     try:
+        # save current configuration
+        if request.method == 'POST' and request.form.get('filename'):
+            filename = "playlist_hiding/"+request.form.get('filename')
+            playlist_hidden_preset = Path(filename)
+            shutil.copy2('.playlist_hidden', playlist_hidden_preset)
+
         # get list of playlists that are already hidden
         playlist_hidden = []
         with open('.playlist_hidden', 'r') as playlist_hidden_read:
@@ -305,7 +313,7 @@ def hideplaylists():
 
             html += '<div style="display: flex; flex-direction: column; flex-grow: 1;">'  # Flex-grow hinzufügen
             html += '<a style="overflow-wrap: break-word; display: inline;" title="'+playlist[1]+'" href="/playlisthandler?playlist='+playlist[0]+'&name='+playlist[1]+'">'+playlist[1]+'</a>'
-            html += '<p style="overflow-wrap: break-word; display: inline;">Number of tracks in this playlist: '+str(playlist[2])+'</p>'
+            html += '<p style="overflow-wrap: break-word; display: inline; color: white">Number of tracks in this playlist: '+str(playlist[2])+'</p>'
             html += '</div>'
 
             html += '<div style="margin-left: auto;">'  # Margin-left: auto für rechtsbündige Ausrichtung
@@ -326,6 +334,15 @@ def hideplaylists():
             html += '</form>'
             html += '</div>'
             html += '<hr style="overflow: hidden; position: relative;">'
+        # save current configuration to file
+        directory = './playlist_hiding'
+        html += '<div class="input-group" style="display: flex;">'
+        html += '<form style="display: flex;" action="/hideplaylists" method="POST">'
+        html += '<input type="text" class="form-control" name="filename" placeholder="filename" aria-label="Filename" aria-describedby="basic-addon1">'
+        html += '<button type="submit" class="btn btn-success" style="margin-left: 10px;">Save current playlist hiding configuration</button>'
+        html += '</form>'
+        html += '</div>'
+        html += '<hr>'
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))
@@ -342,8 +359,8 @@ def playlisthandler():
         name = spotifyapi.getPlaylistName(playlist_id)
         html = ''
         tracks = spotifyapi.getPlaylistTracks(playlist_id, app.config["PLAYLISTS_DYNAMIC_LOADING"])
-        html += '<p style="overflow-wrap: break-word; display:inline;"><h4>'+str(name)+'</h4></p>'
-        html += '<p id="songs_no">Number of tracks in this playlist: '+str(len(tracks))+'</p>'
+        html += '<p style="overflow-wrap: break-word; display:inline;"><h4 style="color: white;">'+str(name)+'</h4></p>'
+        html += '<p id="songs_no" style="color: white;">Number of tracks in this playlist: '+str(len(tracks))+'</p>'
         html += '<hr>'
         html += '<div class="col-lg-13 mx-auto">'
         counter = 0
@@ -436,7 +453,7 @@ def recommendations():
         songs = spotifyapi.getRecommendations(song_id)
         track = songs['tracks'][0]
         html = ''
-        html += '<p style="overflow-wrap: break-word; display:inline;"><h4>Recommendations for '+str(song_name)+'</h4></p>'
+        html += '<p style="overflow-wrap: break-word; display:inline;"><h4 style="color: white;">Recommendations for '+str(song_name)+'</h4></p>'
         html += '<hr>'
         html += '<div class="col-lg-13 mx-auto">'
         counter = 0
@@ -593,8 +610,17 @@ def albumhandler():
 def config():
     global prev_url
     try:
+        # special case for private mode
+        if request.method == 'POST' and request.form.get('preset'):
+            filename = "playlist_hiding/"+request.form.get('preset')
+            playlist_hidden_preset = Path(filename)
+            if playlist_hidden_preset.is_file():
+                shutil.copy2(playlist_hidden_preset, '.playlist_hidden')
+            # playlist storage was changed, therefore trigger reloading of the API
+            spotifyapi.enableReloadPlaylists()
+
         # handle change request
-        if request.method == 'POST':
+        if request.method == 'POST' and request.form.get('config_entry'):
             config_entry = request.form.get('config_entry').upper()
             reverse = True if app.config.get(str(config_entry)) == False else False
             app.config[str(config_entry)] = reverse
@@ -628,7 +654,26 @@ def config():
             html += '</form>'
             html += '<hr>'
         # Also add a link to /hideplaylists
-        html += '<h3 style="margin-left: 50px;"><a href="/hideplaylists">Hideplaylists</a></h3'
+        html += '<h3><a href="/hideplaylists">Hideplaylists</a></h3>'
+
+        # Separate menu for loading of playlist hiding presets
+        html += '<hr>'
+        # List files starting with a dot
+        directory = './playlist_hiding'
+        html += '<div class="input-group" style="display: flex;">'
+        html += '<form style="display: flex;" action="/config" method="POST">'
+        html += '<select style="background: #1a1c24; color: white;" class="form-select" name=preset>'
+        for file in os.listdir(directory):
+            filename = os.fsdecode(file)
+            if filename == '.gitkeep':
+                continue
+            html += '<option style="background: #1a1c24; color: white;" value="'+filename+'">'+filename+'</option>'
+        html += '</select>'
+        html += '<button type="submit" class="btn btn-success" style="margin-left: 10px;">Load playlist preset</button>'
+        html += '</form>'
+        html += '</div>'
+        html += '<hr>'
+
         return render_template('index.html', style_start=style_start, style_end=style_end, html=html, current=spotifyapi.getCurrentlyPlaying(), access_token=spotifyapi.getAccessToken())
     except noauthException:
         return redirect(url_for('auth'))

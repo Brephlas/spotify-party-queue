@@ -24,6 +24,7 @@ class spotifyapi:
         self.play_next = []
         self.currently_playing = ''
         self.loadOfflineStorage()
+        self.reloadPlaylists = False
 
     def setHeader(self, token):
         self.header = {'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token}
@@ -49,6 +50,16 @@ class spotifyapi:
             return self.access_token
         else:
             raise noauthException
+
+    def enableReloadPlaylists(self):
+        self.reloadPlaylists = True
+
+    def getReloadPlaylists(self):
+        if self.reloadPlaylists:
+            self.reloadPlaylists = False
+            return True
+        else:
+            return False
 
     def sendRequest(self, url):
         r = requests.get(url, headers=self.header)
@@ -244,13 +255,16 @@ class spotifyapi:
             raise noauthException
 
     def getPlaylists(self):
-        if self.playlists:
+        reload_required = self.getReloadPlaylists()
+        if self.playlists and not reload_required:
             data = self.sendRequest('https://api.spotify.com/v1/me/playlists?limit=1')
             if data['items'][0]['id'] == self.playlists[0][0]:
-                # if the first local stored song matches with the api's first stored song
+                # if the first local stored playlist matches with the api's first stored playlist
                 # there was no change made and we can use the local list
                 return self.playlists
-        if not self.playlists:
+        if not self.playlists or reload_required:
+            if reload_required:
+                self.playlists.clear()
             try:
                 counter = 0
                 # while there are saved songs left to collect
