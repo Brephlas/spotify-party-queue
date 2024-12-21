@@ -128,7 +128,6 @@
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar p-0 fixed-top d-flex flex-row">
           <div id="logo-mini-div" class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-            <img id="logo-mini" style="height:1em;" src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" onclick="showpageload();window.location.replace('/search');" />
             {% if config["PRIVATE"] == True %}
             <img id="logo-mini" style="height:1em;" src="{{ url_for('static',filename='assets/img/menuicon.png') }}" alt="logo" onclick="showpageload();window.location.replace('/tracks');" />
             {% else %}
