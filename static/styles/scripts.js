@@ -17,11 +17,7 @@ async function fadeOutAnimation(button) {
 
 function addSong(element_id, id, access_token, song_name, img_path) {
   // check if there is an active playback
-  if (
-    (
-      document.documentElement.textContent || document.documentElement.innerText
-    ).indexOf('Nothing playing right now') > -1
-  ) {
+  if ($('#current').text().includes('Nothing playing right now')) {
     iziToast.warning({title: 'There is no playback currently',position: 'topCenter'});
     return;
   }
@@ -397,7 +393,6 @@ window.addEventListener('scroll', function(e) {
           html += '<div>'
           html += '<img class="fading-newelems'+offset+'" style="opacity:.0; width="40" height="40" src="'+cover_url+'" ondblclick="addSong('+counter+', \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')" />'
           html += '<p class="fading-newelems'+offset+'" style="opacity:.0; overflow-wrap: break-word; display:inline; padding-left: 10px; color: white;"><a href="/artists?artist='+artist_id+'">'+artist+'</a> - '+song_name+'</p>'
-
           html += '<div class="btn-group right" role="group">'
           html += '<button type="button" id="'+counter+'" class="btn btn-success right fading-buttons'+offset+'" style="opacity:.0;" onclick="addSong(this.id, \''+uri+'\', \''+access_token+'\', \''+encodeURI(name.replaceAll("'", "%27"))+'\', \''+cover_url+'\')">Add to queue</button>'
           if (RECOMMENDATIONS) {
