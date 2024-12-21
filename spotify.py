@@ -579,8 +579,8 @@ def albumhandler():
         html = ''
         tracks = spotifyapi.getAlbumTracks(album_id)
         # (artist, song, uri, artist_id)
-        html += '<p style="overflow-wrap: break-word; display:inline;"><h4>'+str(album_name)+'</h4></p>'
-        html += '<p id="songs_no">Number of tracks in this album: '+str(len(tracks))+'</p>'
+        html += '<p style="overflow-wrap: break-word; display:inline; color: white;"><h4>'+str(album_name)+'</h4></p>'
+        html += '<p id="songs_no" style="color: white">Number of tracks in this album: '+str(len(tracks))+'</p>'
         html += '<hr>'
         html += '<div class="col-lg-13 mx-auto">'
         counter = 0
