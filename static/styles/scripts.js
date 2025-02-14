@@ -323,8 +323,8 @@ let lastY = 0;
 // Trigger fetching of additional songs
 window.addEventListener('scroll', function(e) {
   // check if end was nearly reached (and function not already ran)
-  let triggerY = window.screen.height/4;
-  if (Math.round(window.innerHeight + window.scrollY) >= document.body.scrollHeight - triggerY && (Math.abs(lastY - window.scrollY) > triggerY || lastY == 0) ) {
+  let triggerY = document.body.scrollHeight/5;
+  if (Math.round(window.innerHeight + window.scrollY) >= Math.round(document.body.scrollHeight - triggerY) && (Math.abs(lastY - window.scrollY) > triggerY || lastY == 0) ) {
     // store last scroll value
     lastY = window.scrollY;
 
