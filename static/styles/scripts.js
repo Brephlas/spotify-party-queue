@@ -324,7 +324,7 @@ let lastY = 0;
 window.addEventListener('scroll', function(e) {
   // check if end was nearly reached (and function not already ran)
   let triggerY = document.body.scrollHeight/5;
-  if (Math.round(window.innerHeight + window.scrollY) >= Math.round(document.body.scrollHeight - triggerY) && (Math.abs(lastY - window.scrollY) > triggerY || lastY == 0) ) {
+  if (Math.round(window.innerHeight + window.scrollY) >= Math.round(document.body.scrollHeight - triggerY) && (Math.abs(lastY - window.scrollY) > triggerY) ) {
     // store last scroll value
     lastY = window.scrollY;
 
